@@ -18,7 +18,22 @@ import { TrabajoDetailSheet } from "@/components/produccion/TrabajoDetailSheet";
 import { KanbanBoard } from "@/components/produccion/KanbanBoard";
 import { toast } from "sonner";
 
+type ProduccionSearch = {
+  tab?: string;
+  materia?: string;
+  fecha?: string;
+  selected?: string;
+};
+
 export const Route = createFileRoute("/produccion")({
+  validateSearch: (search: Record<string, unknown>): ProduccionSearch => {
+    return {
+      tab: (search.tab as string) || "kanban",
+      materia: (search.materia as string) || "todas",
+      fecha: (search.fecha as string) || "",
+      selected: (search.selected as string) || undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Producción Académica — AcadémicoPro" },
@@ -41,9 +56,13 @@ function ProduccionPage() {
   const qc = useQueryClient();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<TrabajoFormValues> | undefined>();
-  const [selected, setSelected] = useState<string | null>(null);
-  const [filterMateria, setFilterMateria] = useState<string>("todas");
-  const [filterFecha, setFilterFecha] = useState<string>("");
+  const searchParams = Route.useSearch();
+  const { tab = "kanban", materia = "todas", fecha = "", selected } = searchParams;
+  
+  const setSelected = (id: string | null) => navigate({ search: (p) => ({ ...p, selected: id || undefined }) });
+  const setFilterMateria = (m: string) => navigate({ search: (p) => ({ ...p, materia: m }) });
+  const setFilterFecha = (f: string) => navigate({ search: (p) => ({ ...p, fecha: f }) });
+  const setTab = (t: string) => navigate({ search: (p) => ({ ...p, tab: t }) });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -87,14 +106,14 @@ function ProduccionPage() {
 
   const trabajosFiltrados = useMemo(() => {
     let t = trabajos ?? [];
-    if (filterMateria !== "todas") {
-      t = t.filter(x => x.materias?.nombre === filterMateria);
+    if (materia !== "todas") {
+      t = t.filter(x => x.materias?.nombre === materia);
     }
-    if (filterFecha) {
-      t = t.filter(x => x.fecha_entrega && x.fecha_entrega.startsWith(filterFecha));
+    if (fecha) {
+      t = t.filter(x => x.fecha_entrega && x.fecha_entrega.startsWith(fecha));
     }
     return t;
-  }, [trabajos, filterMateria, filterFecha]);
+  }, [trabajos, materia, fecha]);
 
   const handleEdit = (id: string) => {
     const t = trabajos?.find((x) => x.id === id);
@@ -136,7 +155,7 @@ function ProduccionPage() {
         <StatCard label="Próximos 7 días" value={stats.proximos} tone="warning" />
       </div>
 
-      <Tabs defaultValue="kanban">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="kanban"><LayoutGrid className="size-4 mr-2" />Kanban</TabsTrigger>
           <TabsTrigger value="tabla"><List className="size-4 mr-2" />Tabla</TabsTrigger>
@@ -156,7 +175,7 @@ function ProduccionPage() {
           <Card>
             <div className="p-4 border-b flex gap-4 items-center bg-muted/20">
               <div className="flex-1 max-w-[200px]">
-                <Select value={filterMateria} onValueChange={setFilterMateria}>
+                <Select value={materia} onValueChange={setFilterMateria}>
                   <SelectTrigger><SelectValue placeholder="Todas las materias" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todas">Todas las materias</SelectItem>
@@ -165,12 +184,13 @@ function ProduccionPage() {
                 </Select>
               </div>
               <div className="flex-1 max-w-[200px]">
-                <Input type="date" value={filterFecha} onChange={(e) => setFilterFecha(e.target.value)} placeholder="Fecha de entrega" />
+                <Input type="date" value={fecha} onChange={(e) => setFilterFecha(e.target.value)} placeholder="Fecha de entrega" />
               </div>
-              {(filterMateria !== "todas" || filterFecha) && (
+              {(materia !== "todas" || fecha) && (
                 <Button variant="ghost" onClick={() => { setFilterMateria("todas"); setFilterFecha(""); }}>Limpiar filtros</Button>
               )}
             </div>
+
             <CardContent className="p-0">
               {/* ✅ Fix: distinguir "sin trabajos" de "filtros sin resultados" */}
               {!trabajos?.length ? (

@@ -10,7 +10,16 @@ import { MateriaDetailPanel } from "@/components/materias/MateriaDetailPanel";
 import { MateriaFormDialog } from "@/components/materias/MateriaFormDialog";
 import { AppSidebar } from "@/components/AppSidebar";
 
+type MateriasSearch = {
+  selected?: string;
+};
+
 export const Route = createFileRoute("/materias")({
+  validateSearch: (search: Record<string, unknown>): MateriasSearch => {
+    return {
+      selected: (search.selected as string) || undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Materias — AcadémicoPro" },
@@ -23,7 +32,9 @@ export const Route = createFileRoute("/materias")({
 function MateriasPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const searchParams = Route.useSearch();
+  const selectedId = searchParams.selected || null;
+  const setSelectedId = (id: string | null) => navigate({ search: (p) => ({ ...p, selected: id || undefined }) });
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {

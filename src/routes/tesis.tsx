@@ -12,7 +12,16 @@ import { CapitulosKanban } from "@/components/tesis/CapitulosKanban";
 import { HitosTimeline } from "@/components/tesis/HitosTimeline";
 import { DocumentosPanel } from "@/components/tesis/DocumentosPanel";
 
+type TesisSearch = {
+  tab?: string;
+};
+
 export const Route = createFileRoute("/tesis")({
+  validateSearch: (search: Record<string, unknown>): TesisSearch => {
+    return {
+      tab: (search.tab as string) || "capitulos",
+    };
+  },
   head: () => ({
     meta: [
       { title: "Tesis — AcadémicoPro" },
@@ -25,6 +34,8 @@ export const Route = createFileRoute("/tesis")({
 function TesisPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { tab = "capitulos" } = Route.useSearch();
+  const setTab = (t: string) => navigate({ search: { tab: t } });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -79,7 +90,7 @@ function TesisPage() {
           <div className="rounded-xl overflow-hidden"
             style={{ background: "rgba(35,5,5,0.72)", border: "1px solid rgba(245,158,11,0.15)", backdropFilter: "blur(12px)" }}>
             <div className="p-6">
-              <Tabs defaultValue="capitulos">
+              <Tabs value={tab} onValueChange={setTab}>
                 <TabsList className="w-full mb-6">
                   <TabsTrigger value="capitulos" className="flex-1">
                     <LayoutGrid className="size-4 mr-2" />Capítulos

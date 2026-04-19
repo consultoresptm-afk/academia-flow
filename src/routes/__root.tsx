@@ -73,6 +73,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+
+function RealtimeSync() {
+  useRealtimeSync();
+  return null;
+}
+
 function RootComponent() {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
@@ -80,6 +87,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <RealtimeSync />
         <Outlet />
         <Toaster richColors position="top-right" />
       </AuthProvider>
