@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TesisRouteImport } from './routes/tesis'
 import { Route as ProduccionRouteImport } from './routes/produccion'
 import { Route as MateriasRouteImport } from './routes/materias'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TesisRoute = TesisRouteImport.update({
+  id: '/tesis',
+  path: '/tesis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProduccionRoute = ProduccionRouteImport.update({
   id: '/produccion',
   path: '/produccion',
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
   '/produccion': typeof ProduccionRoute
+  '/tesis': typeof TesisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
   '/produccion': typeof ProduccionRoute
+  '/tesis': typeof TesisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,14 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
   '/produccion': typeof ProduccionRoute
+  '/tesis': typeof TesisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
+  fullPaths: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion' | '/tesis'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
-  id: '__root__' | '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
+  to: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion' | '/tesis'
+  id: '__root__' | '/' | '/auth' | '/dashboard' | '/materias' | '/produccion' | '/tesis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,10 +86,18 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   MateriasRoute: typeof MateriasRoute
   ProduccionRoute: typeof ProduccionRoute
+  TesisRoute: typeof TesisRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tesis': {
+      id: '/tesis'
+      path: '/tesis'
+      fullPath: '/tesis'
+      preLoaderRoute: typeof TesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produccion': {
       id: '/produccion'
       path: '/produccion'
@@ -125,6 +142,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   MateriasRoute: MateriasRoute,
   ProduccionRoute: ProduccionRoute,
+  TesisRoute: TesisRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

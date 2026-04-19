@@ -12,7 +12,7 @@ const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/materias",  label: "Materias",  icon: BookOpen },
   { to: "/produccion", label: "Producción", icon: FileText },
-  { to: "/tesis", label: "Tesis", icon: Microscope, disabled: true },
+  { to: "/tesis", label: "Tesis", icon: Microscope },
 ];
 
 export function AppSidebar() {
