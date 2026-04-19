@@ -3,12 +3,13 @@ import { LayoutDashboard, BookOpen, GraduationCap, FileText, Microscope, LogOut 
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; disabled?: boolean };
+const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/materias", label: "Materias", icon: BookOpen },
   { to: "/produccion", label: "Producción", icon: FileText, disabled: true },
   { to: "/tesis", label: "Tesis", icon: Microscope, disabled: true },
-] as const;
+];
 
 export function AppSidebar() {
   const { pathname } = useLocation();
