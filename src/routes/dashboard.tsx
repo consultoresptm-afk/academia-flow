@@ -7,8 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Trophy, Clock, AlertTriangle } from "lucide-react";
-import { PomodoroTimer } from "@/components/PomodoroTimer";
-import { ActivityChart } from "@/components/ActivityChart";
+import { AvanceGaugeChart } from "@/components/ActivityChart";
+import { PromedioChart } from "@/components/PomodoroTimer";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -63,13 +63,13 @@ function DashboardPage() {
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-serif text-xl">Actividad semanal</CardTitle>
+            <CardTitle className="font-serif text-xl">Avance general</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ActivityChart />
+          <CardContent className="pb-4">
+            <AvanceGaugeChart />
           </CardContent>
         </Card>
-        <PomodoroTimer />
+        <PromedioChart />
       </div>
 
       <Card>
