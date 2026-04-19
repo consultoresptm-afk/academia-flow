@@ -9,7 +9,7 @@ import {
   FileText, Download, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase as sb } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 const BUCKET = "trabajo-archivos";
 
@@ -187,7 +187,7 @@ function RepositorioTab({ materiaId }: { materiaId: string }) {
   });
 
   const descargar = async (path: string, nombre: string) => {
-    const { data, error } = await sb.storage.from(BUCKET).createSignedUrl(path, 60);
+    const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60);
     if (error || !data) { toast.error("No se pudo generar el enlace"); return; }
     const a = document.createElement("a");
     a.href = data.signedUrl;
