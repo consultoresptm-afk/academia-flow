@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, FileText, LayoutGrid, List } from "lucide-react";
 import { TrabajoFormDialog, type TrabajoFormValues } from "@/components/produccion/TrabajoFormDialog";
 import { TrabajoDetailSheet } from "@/components/produccion/TrabajoDetailSheet";
@@ -40,6 +42,8 @@ function ProduccionPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<TrabajoFormValues> | undefined>();
   const [selected, setSelected] = useState<string | null>(null);
+  const [filterMateria, setFilterMateria] = useState<string>("todas");
+  const [filterFecha, setFilterFecha] = useState<string>("");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -74,6 +78,23 @@ function ProduccionPage() {
       proximos: t.filter((x) => x.fecha_entrega && new Date(x.fecha_entrega).getTime() - Date.now() < 7 * 86400000 && x.estado !== "entrega").length,
     };
   }, [trabajos]);
+
+  const materiasDisponibles = useMemo(() => {
+    const s = new Set<string>();
+    trabajos?.forEach(t => { if (t.materias?.nombre) s.add(t.materias.nombre); });
+    return Array.from(s).sort();
+  }, [trabajos]);
+
+  const trabajosFiltrados = useMemo(() => {
+    let t = trabajos ?? [];
+    if (filterMateria !== "todas") {
+      t = t.filter(x => x.materias?.nombre === filterMateria);
+    }
+    if (filterFecha) {
+      t = t.filter(x => x.fecha_entrega && x.fecha_entrega.startsWith(filterFecha));
+    }
+    return t;
+  }, [trabajos, filterMateria, filterFecha]);
 
   const handleEdit = (id: string) => {
     const t = trabajos?.find((x) => x.id === id);
@@ -133,8 +154,28 @@ function ProduccionPage() {
 
         <TabsContent value="tabla" className="mt-4">
           <Card>
+            <div className="p-4 border-b flex gap-4 items-center bg-muted/20">
+              <div className="flex-1 max-w-[200px]">
+                <Select value={filterMateria} onValueChange={setFilterMateria}>
+                  <SelectTrigger><SelectValue placeholder="Todas las materias" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas las materias</SelectItem>
+                    {materiasDisponibles.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1 max-w-[200px]">
+                <Input type="date" value={filterFecha} onChange={(e) => setFilterFecha(e.target.value)} placeholder="Fecha de entrega" />
+              </div>
+              {(filterMateria !== "todas" || filterFecha) && (
+                <Button variant="ghost" onClick={() => { setFilterMateria("todas"); setFilterFecha(""); }}>Limpiar filtros</Button>
+              )}
+            </div>
             <CardContent className="p-0">
-              {trabajos?.length ? (
+              {/* ✅ Fix: distinguir "sin trabajos" de "filtros sin resultados" */}
+              {!trabajos?.length ? (
+                <EmptyState onCreate={() => setFormOpen(true)} />
+              ) : trabajosFiltrados.length ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -147,7 +188,7 @@ function ProduccionPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {trabajos.map((t) => (
+                    {trabajosFiltrados.map((t) => (
                       <TableRow key={t.id} className="cursor-pointer" onClick={() => setSelected(t.id)}>
                         <TableCell className="font-medium">{t.titulo}</TableCell>
                         <TableCell>{t.materias?.nombre ?? "—"}</TableCell>
@@ -159,7 +200,11 @@ function ProduccionPage() {
                     ))}
                   </TableBody>
                 </Table>
-              ) : <EmptyState onCreate={() => setFormOpen(true)} />}
+              ) : (
+                <div className="p-8 text-center text-muted-foreground text-sm">
+                  No hay trabajos que coincidan con los filtros seleccionados.
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

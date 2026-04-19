@@ -10,6 +10,35 @@ import { toast } from "sonner";
 
 const BUCKET = "trabajo-archivos";
 
+const compressImage = async (file: File, maxWidth = 1920, quality = 0.8): Promise<File> => {
+  if (!file.type.startsWith('image/')) return file;
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(file);
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        if (!blob) return resolve(file);
+        // Rename ext to .jpg since we use image/jpeg
+        const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+        resolve(new File([blob], newName, { type: 'image/jpeg' }));
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => resolve(file);
+  });
+};
+
 export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -29,31 +58,43 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
     },
   });
 
-  const upload = async (file: File) => {
-    if (!user) return;
+  const handleUploadMultiple = async (files: FileList) => {
+    if (!user || files.length === 0) return;
     setUploading(true);
-    const path = `${user.id}/${trabajoId}/${Date.now()}-${file.name}`;
-    const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
-    if (upErr) {
-      toast.error(upErr.message);
-      setUploading(false);
-      return;
+    let successCount = 0;
+    
+    for (let i = 0; i < files.length; i++) {
+      let file = files[i];
+      try {
+        // Compresión automática de imágenes
+        if (file.type.startsWith('image/')) {
+          file = await compressImage(file);
+        }
+        
+        const path = `${user.id}/${trabajoId}/${Date.now()}-${file.name}`;
+        const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
+        if (upErr) throw upErr;
+        
+        const { error } = await supabase.from("trabajo_archivos").insert({
+          user_id: user.id,
+          trabajo_id: trabajoId,
+          nombre: file.name,
+          storage_path: path,
+          tipo: file.type,
+          tamanio: file.size,
+        });
+        if (error) throw error;
+        successCount++;
+      } catch (err: any) {
+        toast.error(`Error subiendo ${file.name}: ${err.message}`);
+      }
     }
-    const { error } = await supabase.from("trabajo_archivos").insert({
-      user_id: user.id,
-      trabajo_id: trabajoId,
-      nombre: file.name,
-      storage_path: path,
-      tipo: file.type,
-      tamanio: file.size,
-    });
+    
     setUploading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    if (successCount > 0) {
+      toast.success(`${successCount} archivo(s) subido(s) correctamente`);
+      qc.invalidateQueries({ queryKey: ["archivos", trabajoId] });
     }
-    toast.success("Archivo subido");
-    qc.invalidateQueries({ queryKey: ["archivos", trabajoId] });
   };
 
   const removeMutation = useMutation({
@@ -86,15 +127,17 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
       <div className="flex items-center gap-2">
         <Input
           type="file"
+          multiple
           disabled={uploading}
           onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) upload(f);
+            if (e.target.files?.length) {
+              handleUploadMultiple(e.target.files);
+            }
             e.target.value = "";
           }}
           className="cursor-pointer"
         />
-        {uploading && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+        {uploading && <Loader2 className="size-4 animate-spin text-muted-foreground shrink-0" />}
       </div>
 
       {archivos?.length ? (
@@ -121,7 +164,7 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
       ) : (
         <div className="text-xs text-muted-foreground py-4 text-center border border-dashed rounded-md">
           <Upload className="size-4 mx-auto mb-1 opacity-50" />
-          Sube PDFs, imágenes o documentos
+          Sube PDFs, imágenes o documentos (Las imágenes se comprimirán automáticamente)
         </div>
       )}
     </div>
