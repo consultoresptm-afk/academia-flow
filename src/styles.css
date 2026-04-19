@@ -4,15 +4,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * AcadémicoPro — Design System
- * Verde corporativo + blanco + grises
- * Inter (cuerpo) + Playfair Display (títulos)
- */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AcadémicoPro — CYBERPUNK WARM DESIGN SYSTEM
+   Paleta: Borgoña profundo → Rojo óxido → Naranja neón
+   Fuentes: Rajdhani (títulos) + Inter (cuerpo)
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
 @theme inline {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
+  --font-serif: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -59,116 +60,414 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ── MODO ÚNICO: Cyberpunk Warm (siempre oscuro) ────────────────────────────── */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 
-  /* Base — blanco roto + grises elegantes */
-  --background: oklch(0.99 0.005 150);
-  --foreground: oklch(0.18 0.02 160);
+  /* Fondo: degradado borgoña → naranja óxido (se aplica en body) */
+  --background: #1a0505;
+  --foreground: #f5e6d3;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 160);
+  /* Tarjetas/Paneles: cristal oscuro con tinte borgoña */
+  --card: rgba(35, 5, 5, 0.75);
+  --card-foreground: #f5e6d3;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 160);
+  --popover: rgba(30, 4, 4, 0.92);
+  --popover-foreground: #f5e6d3;
 
-  /* Primary — verde corporativo profundo */
-  --primary: oklch(0.50 0.14 150);
-  --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.65 0.17 145);
+  /* Primary: naranja neón — el color de acción principal */
+  --primary: #f59e0b;
+  --primary-foreground: #1a0505;
+  --primary-glow: #fbbf24;
 
-  /* Secondary — gris claro */
-  --secondary: oklch(0.96 0.01 150);
-  --secondary-foreground: oklch(0.25 0.02 160);
+  /* Secondary: borgoña translúcido */
+  --secondary: rgba(74, 4, 4, 0.6);
+  --secondary-foreground: #f5e6d3;
 
-  --muted: oklch(0.96 0.005 150);
-  --muted-foreground: oklch(0.50 0.015 160);
+  /* Muted: muy oscuro con tinte vino */
+  --muted: rgba(45, 5, 5, 0.7);
+  --muted-foreground: #d4a574;
 
-  --accent: oklch(0.93 0.04 150);
-  --accent-foreground: oklch(0.30 0.08 150);
+  /* Accent: resplandor naranja suave */
+  --accent: rgba(139, 34, 34, 0.4);
+  --accent-foreground: #fbbf24;
 
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.99 0 0);
+  /* Destructive: rojo brillante */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-  --success: oklch(0.62 0.16 150);
-  --success-foreground: oklch(0.99 0 0);
+  /* Success: naranja-amarillo (en tema cálido) */
+  --success: #eab308;
+  --success-foreground: #1a0505;
 
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.20 0.05 75);
+  /* Warning: naranja más intenso */
+  --warning: #f97316;
+  --warning-foreground: #1a0505;
 
-  --border: oklch(0.92 0.008 150);
-  --input: oklch(0.92 0.008 150);
-  --ring: oklch(0.50 0.14 150);
+  /* Bordes: línea naranja neón muy fina */
+  --border: rgba(245, 158, 11, 0.2);
+  --input: rgba(74, 4, 4, 0.5);
+  --ring: #f59e0b;
 
-  /* Charts en tonos verdes/complementarios */
-  --chart-1: oklch(0.55 0.15 150);
-  --chart-2: oklch(0.65 0.13 175);
-  --chart-3: oklch(0.70 0.14 90);
-  --chart-4: oklch(0.60 0.18 30);
-  --chart-5: oklch(0.45 0.10 250);
+  /* Charts: escala naranja → amarillo neón */
+  --chart-1: #f59e0b;
+  --chart-2: #fbbf24;
+  --chart-3: #f97316;
+  --chart-4: #ef4444;
+  --chart-5: #fde68a;
 
-  /* Sidebar */
-  --sidebar: oklch(0.20 0.02 160);
-  --sidebar-foreground: oklch(0.95 0.01 150);
-  --sidebar-primary: oklch(0.65 0.17 145);
-  --sidebar-primary-foreground: oklch(0.15 0.02 160);
-  --sidebar-accent: oklch(0.28 0.03 160);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.30 0.02 160);
-  --sidebar-ring: oklch(0.65 0.17 145);
+  /* Sidebar: cristal borgoña profundo */
+  --sidebar: rgba(20, 2, 2, 0.88);
+  --sidebar-foreground: #f5e6d3;
+  --sidebar-primary: #f59e0b;
+  --sidebar-primary-foreground: #1a0505;
+  --sidebar-accent: rgba(74, 4, 4, 0.5);
+  --sidebar-accent-foreground: #fbbf24;
+  --sidebar-border: rgba(245, 158, 11, 0.15);
+  --sidebar-ring: #f59e0b;
 
-  /* Gradientes & sombras */
-  --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
-  --gradient-subtle: linear-gradient(180deg, oklch(0.99 0.005 150), oklch(0.96 0.01 150));
-  --shadow-elegant: 0 10px 30px -12px color-mix(in oklab, var(--primary) 25%, transparent);
-  --shadow-soft: 0 2px 8px -2px color-mix(in oklab, var(--foreground) 10%, transparent);
+  /* Sombras cálidas */
+  --shadow-glow: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 60px rgba(139, 34, 34, 0.2);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(245, 158, 11, 0.15);
+  --shadow-elegant: 0 10px 30px -12px rgba(245, 158, 11, 0.4);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, #f59e0b, #f97316);
+  --gradient-bg: radial-gradient(ellipse at 80% 100%, #d97706 0%, #8b2222 40%, #4a0404 70%, #1a0505 100%);
 }
 
+/* La clase .dark reutiliza exactamente los mismos valores (diseño siempre oscuro) */
 .dark {
-  --background: oklch(0.16 0.02 160);
-  --foreground: oklch(0.97 0.01 150);
-  --card: oklch(0.22 0.02 160);
-  --card-foreground: oklch(0.97 0.01 150);
-  --popover: oklch(0.22 0.02 160);
-  --popover-foreground: oklch(0.97 0.01 150);
-  --primary: oklch(0.70 0.16 145);
-  --primary-foreground: oklch(0.15 0.02 160);
-  --primary-glow: oklch(0.78 0.18 145);
-  --secondary: oklch(0.28 0.02 160);
-  --secondary-foreground: oklch(0.97 0.01 150);
-  --muted: oklch(0.26 0.02 160);
-  --muted-foreground: oklch(0.70 0.015 150);
-  --accent: oklch(0.32 0.06 150);
-  --accent-foreground: oklch(0.95 0.02 150);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.70 0.16 150);
-  --success-foreground: oklch(0.15 0.02 160);
-  --warning: oklch(0.80 0.15 75);
-  --warning-foreground: oklch(0.20 0.05 75);
-  --border: oklch(0.30 0.02 160);
-  --input: oklch(0.30 0.02 160);
-  --ring: oklch(0.70 0.16 145);
-  --sidebar: oklch(0.13 0.02 160);
-  --sidebar-foreground: oklch(0.97 0.01 150);
-  --sidebar-primary: oklch(0.70 0.16 145);
-  --sidebar-primary-foreground: oklch(0.13 0.02 160);
-  --sidebar-accent: oklch(0.22 0.02 160);
-  --sidebar-accent-foreground: oklch(0.97 0.01 150);
-  --sidebar-border: oklch(0.25 0.02 160);
-  --sidebar-ring: oklch(0.70 0.16 145);
+  --background: #1a0505;
+  --foreground: #f5e6d3;
+  --card: rgba(35, 5, 5, 0.75);
+  --card-foreground: #f5e6d3;
+  --popover: rgba(30, 4, 4, 0.92);
+  --popover-foreground: #f5e6d3;
+  --primary: #f59e0b;
+  --primary-foreground: #1a0505;
+  --primary-glow: #fbbf24;
+  --secondary: rgba(74, 4, 4, 0.6);
+  --secondary-foreground: #f5e6d3;
+  --muted: rgba(45, 5, 5, 0.7);
+  --muted-foreground: #d4a574;
+  --accent: rgba(139, 34, 34, 0.4);
+  --accent-foreground: #fbbf24;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: #eab308;
+  --success-foreground: #1a0505;
+  --warning: #f97316;
+  --warning-foreground: #1a0505;
+  --border: rgba(245, 158, 11, 0.2);
+  --input: rgba(74, 4, 4, 0.5);
+  --ring: #f59e0b;
+  --chart-1: #f59e0b;
+  --chart-2: #fbbf24;
+  --chart-3: #f97316;
+  --chart-4: #ef4444;
+  --chart-5: #fde68a;
+  --sidebar: rgba(20, 2, 2, 0.88);
+  --sidebar-foreground: #f5e6d3;
+  --sidebar-primary: #f59e0b;
+  --sidebar-primary-foreground: #1a0505;
+  --sidebar-accent: rgba(74, 4, 4, 0.5);
+  --sidebar-accent-foreground: #fbbf24;
+  --sidebar-border: rgba(245, 158, 11, 0.15);
+  --sidebar-ring: #f59e0b;
 }
 
+/* ── BASE GLOBAL ─────────────────────────────────────────────────────────────── */
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    min-height: 100vh;
+    height: 100%;
+  }
+
   body {
-    background-color: var(--color-background);
+    /* Degradado cálido como fondo fijo de toda la app */
+    background: var(--gradient-bg);
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
-  h1, h2, h3, .font-serif {
+
+  /* Patrón de partículas/bokeh sobre el fondo usando pseudo-elemento */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 85%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 85% 15%, rgba(139, 34, 34, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Cuadrícula digital muy sutil */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #root, [data-root] {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Tipografía */
+  h1, h2, h3, h4, .font-serif {
     font-family: var(--font-serif);
-    letter-spacing: -0.01em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Scrollbar cyberpunk */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: rgba(26, 5, 5, 0.5); }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.4);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.7); }
+}
+
+/* ── COMPONENTES CYBERPUNK CÁLIDO ────────────────────────────────────────────── */
+@layer components {
+
+  /* Tarjetas: cristal borgoña translúcido */
+  .card-cyber {
+    background: rgba(35, 5, 5, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Resplandor naranja al hover de botones y elementos interactivos */
+  .glow-orange {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .glow-orange:hover {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.5), 0 0 20px rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+
+  /* Texto con resplandor */
+  .text-glow {
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.6), 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Línea de acento naranja */
+  .border-neon {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.2);
+  }
+
+  /* Badge estilo cyber */
+  .badge-cyber {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
   }
 }
+
+/* ── OVERRIDES DE SHADCN/UI ─────────────────────────────────────────────────── */
+@layer base {
+
+  /* ─ Cards ─ */
+  [class*="rounded"][class*="border"] {
+    background: rgba(35, 5, 5, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: rgba(245, 158, 11, 0.18);
+  }
+
+  /* ─ Inputs, Textareas, Selects ─ */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,
+  [role="combobox"] {
+    background: rgba(20, 2, 2, 0.7) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+    color: #f5e6d3 !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+  textarea:focus {
+    border-color: rgba(245, 158, 11, 0.7) !important;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15), 0 0 8px rgba(245, 158, 11, 0.2) !important;
+    outline: none;
+  }
+
+  /* ─ Buttons ─ */
+  button[class*="bg-primary"] {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: #1a0505;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    transition: box-shadow 0.2s, transform 0.1s;
+  }
+  button[class*="bg-primary"]:hover {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.2);
+    transform: translateY(-1px);
+  }
+
+  /* Botones outline y ghost */
+  button[class*="border-input"],
+  button[class*="bg-transparent"] {
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f5e6d3;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  button[class*="border-input"]:hover,
+  button[class*="bg-transparent"]:hover {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(245, 158, 11, 0.08);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+  }
+
+  /* ─ Badges ─ */
+  [class*="badge"],
+  [data-slot="badge"] {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.65rem;
+  }
+
+  /* ─ Tabs ─ */
+  [role="tablist"] {
+    background: rgba(26, 5, 5, 0.6) !important;
+    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+    padding: 3px;
+  }
+  [role="tab"] {
+    color: #d4a574;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  [role="tab"][data-state="active"] {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(249, 115, 22, 0.15)) !important;
+    color: #fbbf24 !important;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3), inset 0 0 0 1px rgba(245, 158, 11, 0.3) !important;
+  }
+
+  /* ─ Tablas ─ */
+  table { border-collapse: separate; border-spacing: 0; }
+  thead tr { background: rgba(74, 4, 4, 0.4); }
+  thead th {
+    color: #f59e0b !important;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.3) !important;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(245, 158, 11, 0.08) !important;
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(245, 158, 11, 0.05) !important; }
+
+  /* ─ Dialogs / Sheets ─ */
+  [role="dialog"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"] {
+    background: rgba(20, 3, 3, 0.96) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.15), 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+  }
+
+  /* ─ Select / Dropdown ─ */
+  [role="listbox"],
+  [data-radix-popper-content-wrapper] > div {
+    background: rgba(20, 3, 3, 0.97) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    backdrop-filter: blur(16px);
+  }
+  [role="option"]:hover,
+  [role="option"][data-highlighted] {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #fbbf24 !important;
+  }
+
+  /* ─ Progress bar ─ */
+  [role="progressbar"] > div {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24) !important;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+  }
+  [role="progressbar"] {
+    background: rgba(74, 4, 4, 0.5) !important;
+  }
+
+  /* ─ Separadores / Dividers ─ */
+  hr, [role="separator"] {
+    border-color: rgba(245, 158, 11, 0.15) !important;
+  }
+
+  /* ─ Labels ─ */
+  label {
+    color: #d4a574;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  /* ─ Toaster/Sonner ─ */
+  [data-sonner-toast] {
+    background: rgba(20, 3, 3, 0.96) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    color: #f5e6d3 !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.2) !important;
+  }
+}
+
+/* ── ANIMACIONES CYBERPUNK ────────────────────────────────────────────────────── */
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(245, 158, 11, 0.4), 0 0 12px rgba(245, 158, 11, 0.2); }
+  50% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes flicker {
+  0%, 98%, 100% { opacity: 1; }
+  99% { opacity: 0.85; }
+}
+
+/* Aplica al botón primario activo */
+.btn-neon-active { animation: neon-pulse 2s ease-in-out infinite; }
+
+/* Texto de "AcadémicoPro" con efecto flicker muy sutil */
+.brand-text { animation: flicker 8s infinite; }
