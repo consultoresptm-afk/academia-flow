@@ -92,6 +92,174 @@ export type Database = {
         }
         Relationships: []
       }
+      referencias: {
+        Row: {
+          anio: number | null
+          autores: string
+          cita_apa: string | null
+          created_at: string
+          doi: string | null
+          editorial: string | null
+          fuente: string | null
+          id: string
+          tipo: string
+          titulo: string
+          trabajo_id: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          anio?: number | null
+          autores: string
+          cita_apa?: string | null
+          created_at?: string
+          doi?: string | null
+          editorial?: string | null
+          fuente?: string | null
+          id?: string
+          tipo?: string
+          titulo: string
+          trabajo_id: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          anio?: number | null
+          autores?: string
+          cita_apa?: string | null
+          created_at?: string
+          doi?: string | null
+          editorial?: string | null
+          fuente?: string | null
+          id?: string
+          tipo?: string
+          titulo?: string
+          trabajo_id?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referencias_trabajo_id_fkey"
+            columns: ["trabajo_id"]
+            isOneToOne: false
+            referencedRelation: "trabajos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trabajo_archivos: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          storage_path: string
+          tamanio: number | null
+          tipo: string | null
+          trabajo_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          storage_path: string
+          tamanio?: number | null
+          tipo?: string | null
+          trabajo_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          storage_path?: string
+          tamanio?: number | null
+          tipo?: string | null
+          trabajo_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trabajo_archivos_trabajo_id_fkey"
+            columns: ["trabajo_id"]
+            isOneToOne: false
+            referencedRelation: "trabajos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trabajos: {
+        Row: {
+          contenido: string | null
+          contenido_humanizado: string | null
+          created_at: string
+          descripcion: string | null
+          estado: string
+          fecha_entrega: string | null
+          id: string
+          instrucciones: string | null
+          materia_id: string | null
+          nota: number | null
+          objetivos: string | null
+          paginas_estimadas: number | null
+          palabras_clave: string[] | null
+          peso: number | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contenido?: string | null
+          contenido_humanizado?: string | null
+          created_at?: string
+          descripcion?: string | null
+          estado?: string
+          fecha_entrega?: string | null
+          id?: string
+          instrucciones?: string | null
+          materia_id?: string | null
+          nota?: number | null
+          objetivos?: string | null
+          paginas_estimadas?: number | null
+          palabras_clave?: string[] | null
+          peso?: number | null
+          tipo?: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contenido?: string | null
+          contenido_humanizado?: string | null
+          created_at?: string
+          descripcion?: string | null
+          estado?: string
+          fecha_entrega?: string | null
+          id?: string
+          instrucciones?: string | null
+          materia_id?: string | null
+          nota?: number | null
+          objetivos?: string | null
+          paginas_estimadas?: number | null
+          palabras_clave?: string[] | null
+          peso?: number | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trabajos_materia_id_fkey"
+            columns: ["materia_id"]
+            isOneToOne: false
+            referencedRelation: "materias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

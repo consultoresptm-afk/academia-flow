@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProduccionRouteImport } from './routes/produccion'
 import { Route as MateriasRouteImport } from './routes/materias'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProduccionRoute = ProduccionRouteImport.update({
+  id: '/produccion',
+  path: '/produccion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MateriasRoute = MateriasRouteImport.update({
   id: '/materias',
   path: '/materias',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/produccion': typeof ProduccionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/produccion': typeof ProduccionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/produccion': typeof ProduccionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/materias'
+  fullPaths: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/materias'
-  id: '__root__' | '/' | '/auth' | '/dashboard' | '/materias'
+  to: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
+  id: '__root__' | '/' | '/auth' | '/dashboard' | '/materias' | '/produccion'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,10 +76,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   MateriasRoute: typeof MateriasRoute
+  ProduccionRoute: typeof ProduccionRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/produccion': {
+      id: '/produccion'
+      path: '/produccion'
+      fullPath: '/produccion'
+      preLoaderRoute: typeof ProduccionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/materias': {
       id: '/materias'
       path: '/materias'
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   MateriasRoute: MateriasRoute,
+  ProduccionRoute: ProduccionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
