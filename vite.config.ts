@@ -6,4 +6,29 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+export default defineConfig({
+  vite: {
+    server: {
+      hmr: {
+        overlay: true,
+      },
+      watch: {
+        usePolling: true,
+        interval: 100,
+      },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            "react-vendor": ["react", "react-dom"],
+            "tanstack": ["@tanstack/react-router", "@tanstack/react-query"],
+            "supabase": ["@supabase/supabase-js"],
+            "ui-icons": ["lucide-react"],
+            "charts": ["recharts"],
+          },
+        },
+      },
+    },
+  },
+});
