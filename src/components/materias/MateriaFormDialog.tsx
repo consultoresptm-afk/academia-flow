@@ -1,0 +1,111 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+const COLORS = ["#16a34a", "#0891b2", "#7c3aed", "#dc2626", "#d97706", "#0284c7", "#db2777", "#ea580c"];
+
+type Props = { open: boolean; onOpenChange: (v: boolean) => void; userId: string };
+
+export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    nombre: "", codigo: "", docente: "", creditos: 3,
+    semestre: "", color: COLORS[0], descripcion: "",
+  });
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("materias").insert({
+        user_id: userId,
+        nombre: form.nombre,
+        codigo: form.codigo || null,
+        docente: form.docente || null,
+        creditos: form.creditos,
+        semestre: form.semestre || null,
+        color: form.color,
+        descripcion: form.descripcion || null,
+        estado: "activa",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Materia creada");
+      qc.invalidateQueries({ queryKey: ["materias"] });
+      onOpenChange(false);
+      setForm({ nombre: "", codigo: "", docente: "", creditos: 3, semestre: "", color: COLORS[0], descripcion: "" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="font-serif text-2xl">Nueva materia</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="mat-nombre">Nombre *</Label>
+            <Input id="mat-nombre" required value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="mat-codigo">Código</Label>
+              <Input id="mat-codigo" value={form.codigo}
+                onChange={(e) => setForm({ ...form, codigo: e.target.value })} placeholder="MAT-101" />
+            </div>
+            <div>
+              <Label htmlFor="mat-creditos">Créditos</Label>
+              <Input id="mat-creditos" type="number" min={1} max={10} value={form.creditos}
+                onChange={(e) => setForm({ ...form, creditos: Number(e.target.value) })} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="mat-docente">Docente</Label>
+              <Input id="mat-docente" value={form.docente}
+                onChange={(e) => setForm({ ...form, docente: e.target.value })} />
+            </div>
+            <div>
+              <Label htmlFor="mat-semestre">Semestre</Label>
+              <Input id="mat-semestre" value={form.semestre}
+                onChange={(e) => setForm({ ...form, semestre: e.target.value })} placeholder="2025-I" />
+            </div>
+          </div>
+          <div>
+            <Label>Color de identificación</Label>
+            <div className="flex gap-2 mt-2">
+              {COLORS.map((c) => (
+                <button key={c} type="button" onClick={() => setForm({ ...form, color: c })}
+                  className={`size-8 rounded-full border-2 transition-transform hover:scale-110 ${form.color === c ? "border-foreground scale-110 ring-2 ring-offset-2 ring-foreground/30" : "border-transparent"}`}
+                  style={{ backgroundColor: c }} aria-label={c} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="mat-desc">Descripción</Label>
+            <Textarea id="mat-desc" rows={2} value={form.descripcion}
+              onChange={(e) => setForm({ ...form, descripcion: e.target.value })} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button onClick={() => save.mutate()} disabled={!form.nombre || save.isPending}>
+            {save.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+            Crear materia
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
