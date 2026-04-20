@@ -32,7 +32,7 @@ export function TrabajoDetailSheet({
     // ✅ Fix #1: queryFn limpia, sin side-effects de setState
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("trabajos").select("*, materias(nombre, color)")
+        .from("trabajos").select("*, materias(nombre, color, docente)")
         .eq("id", trabajoId!).maybeSingle();
       if (error) throw error;
       return data;
@@ -139,8 +139,23 @@ export function TrabajoDetailSheet({
     try {
       const texto = humanizado?.trim() || contenido?.trim();
       if (!texto) { toast.error("Sin contenido para exportar"); setBusy(null); return; }
+
+      // Cargar perfil para enriquecer la portada APA con nombre/programa del autor
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user
+        ? await supabase
+            .from("profiles")
+            .select("display_name, programa")
+            .eq("user_id", user.id)
+            .maybeSingle()
+        : { data: null };
+
       const blob = await exportarTrabajoWord({
         titulo: trabajo.titulo,
+        autor: profile?.display_name ?? user?.email ?? undefined,
+        institucion: profile?.programa ?? undefined,
+        curso: trabajo.materias?.nombre ?? undefined,
+        docente: trabajo.materias?.docente ?? undefined,
         contenido: texto,
         referencias: refs?.map((r) => r.cita_apa ?? "").filter(Boolean) ?? [],
       });
