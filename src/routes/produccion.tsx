@@ -59,10 +59,10 @@ function ProduccionPage() {
   const searchParams = Route.useSearch();
   const { tab = "kanban", materia = "todas", fecha = "", selected } = searchParams;
   
-  const setSelected = (id: string | null) => navigate({ search: (p) => ({ ...p, selected: id || undefined }) });
-  const setFilterMateria = (m: string) => navigate({ search: (p) => ({ ...p, materia: m }) });
-  const setFilterFecha = (f: string) => navigate({ search: (p) => ({ ...p, fecha: f }) });
-  const setTab = (t: string) => navigate({ search: (p) => ({ ...p, tab: t }) });
+  const setSelected = (id: string | null) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, selected: id || undefined }) });
+  const setFilterMateria = (m: string) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, materia: m }) });
+  const setFilterFecha = (f: string) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, fecha: f }) });
+  const setTab = (t: string) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, tab: t }) });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
