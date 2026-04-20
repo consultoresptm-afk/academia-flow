@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Trash2, FileText, Loader2, Upload, Download } from "lucide-react";
 import { toast } from "sonner";
@@ -43,6 +42,8 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: archivos } = useQuery({
     enabled: !!user,
@@ -124,20 +125,51 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <Input
-          type="file"
-          multiple
-          disabled={uploading}
-          onChange={(e) => {
-            if (e.target.files?.length) {
-              handleUploadMultiple(e.target.files);
-            }
-            e.target.value = "";
-          }}
-          className="cursor-pointer"
-        />
-        {uploading && <Loader2 className="size-4 animate-spin text-muted-foreground shrink-0" />}
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        className="hidden"
+        disabled={uploading}
+        onChange={(e) => {
+          if (e.target.files?.length) handleUploadMultiple(e.target.files);
+          e.target.value = "";
+        }}
+      />
+
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => !uploading && inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if ((e.key === "Enter" || e.key === " ") && !uploading) inputRef.current?.click();
+        }}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (e.dataTransfer.files?.length) handleUploadMultiple(e.dataTransfer.files);
+        }}
+        className={`cursor-pointer rounded-md border-2 border-dashed py-6 px-4 text-center text-xs transition-colors
+          ${dragOver ? "border-primary bg-primary/10" : "border-border hover:border-primary/60 hover:bg-muted/30"}
+          ${uploading ? "opacity-60 pointer-events-none" : ""}`}
+      >
+        {uploading ? (
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" /> Subiendo...
+          </div>
+        ) : (
+          <>
+            <Upload className="size-5 mx-auto mb-2 opacity-60" />
+            <div className="font-medium text-foreground mb-0.5">
+              Haz clic o arrastra archivos aquí
+            </div>
+            <div className="text-muted-foreground">
+              PDFs, imágenes o documentos · las imágenes se comprimen automáticamente
+            </div>
+          </>
+        )}
       </div>
 
       {archivos?.length ? (
@@ -161,12 +193,7 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
             </Card>
           ))}
         </div>
-      ) : (
-        <div className="text-xs text-muted-foreground py-4 text-center border border-dashed rounded-md">
-          <Upload className="size-4 mx-auto mb-1 opacity-50" />
-          Sube PDFs, imágenes o documentos (Las imágenes se comprimirán automáticamente)
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
