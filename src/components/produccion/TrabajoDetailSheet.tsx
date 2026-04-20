@@ -87,18 +87,30 @@ export function TrabajoDetailSheet({
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Helper: obtiene el access token actual y lo envía al server fn como Bearer
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) throw new Error("Debes iniciar sesión para usar la IA");
+    return { Authorization: `Bearer ${token}` };
+  };
+
   const handleGenerar = async () => {
     if (!trabajo) return;
     setBusy("gen");
     try {
-      const res = await generarContenido({ data: {
-        titulo: trabajo.titulo, tipo: trabajo.tipo,
-        descripcion: trabajo.descripcion ?? undefined,
-        instrucciones: trabajo.instrucciones ?? undefined,
-        objetivos: trabajo.objetivos ?? undefined,
-        palabrasClave: trabajo.palabras_clave ?? undefined,
-        paginas: trabajo.paginas_estimadas ?? 5,
-      }});
+      const headers = await getAuthHeaders();
+      const res = await generarContenido({
+        headers,
+        data: {
+          titulo: trabajo.titulo, tipo: trabajo.tipo,
+          descripcion: trabajo.descripcion ?? undefined,
+          instrucciones: trabajo.instrucciones ?? undefined,
+          objetivos: trabajo.objetivos ?? undefined,
+          palabrasClave: trabajo.palabras_clave ?? undefined,
+          paginas: trabajo.paginas_estimadas ?? 5,
+        },
+      });
       setContenido(res.contenido);
       await saveContent.mutateAsync({ contenido: res.contenido });
       toast.success("Contenido generado");
@@ -111,7 +123,8 @@ export function TrabajoDetailSheet({
     if (!contenido?.trim()) { toast.error("Genera contenido primero"); return; }
     setBusy("hum");
     try {
-      const res = await humanizarContenido({ data: { contenido } });
+      const headers = await getAuthHeaders();
+      const res = await humanizarContenido({ headers, data: { contenido } });
       setHumanizado(res.contenido);
       await saveContent.mutateAsync({ contenido_humanizado: res.contenido });
       toast.success("Contenido humanizado");
