@@ -148,6 +148,210 @@ export type Database = {
           },
         ]
       }
+      tesis: {
+        Row: {
+          co_director: string | null
+          created_at: string
+          director: string | null
+          estado: string
+          fecha_defensa: string | null
+          fecha_inicio: string | null
+          id: string
+          institucion: string | null
+          palabras_actuales: number | null
+          palabras_clave: string[] | null
+          palabras_objetivo: number | null
+          programa: string | null
+          resumen: string | null
+          subtitulo: string | null
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          co_director?: string | null
+          created_at?: string
+          director?: string | null
+          estado?: string
+          fecha_defensa?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          institucion?: string | null
+          palabras_actuales?: number | null
+          palabras_clave?: string[] | null
+          palabras_objetivo?: number | null
+          programa?: string | null
+          resumen?: string | null
+          subtitulo?: string | null
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          co_director?: string | null
+          created_at?: string
+          director?: string | null
+          estado?: string
+          fecha_defensa?: string | null
+          fecha_inicio?: string | null
+          id?: string
+          institucion?: string | null
+          palabras_actuales?: number | null
+          palabras_clave?: string[] | null
+          palabras_objetivo?: number | null
+          programa?: string | null
+          resumen?: string | null
+          subtitulo?: string | null
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tesis_capitulos: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          estado: string
+          fecha_limite: string | null
+          id: string
+          notas: string | null
+          orden: number
+          palabras_actuales: number | null
+          palabras_objetivo: number | null
+          tesis_id: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          estado?: string
+          fecha_limite?: string | null
+          id?: string
+          notas?: string | null
+          orden?: number
+          palabras_actuales?: number | null
+          palabras_objetivo?: number | null
+          tesis_id: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          estado?: string
+          fecha_limite?: string | null
+          id?: string
+          notas?: string | null
+          orden?: number
+          palabras_actuales?: number | null
+          palabras_objetivo?: number | null
+          tesis_id?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tesis_capitulos_tesis_id_fkey"
+            columns: ["tesis_id"]
+            isOneToOne: false
+            referencedRelation: "tesis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tesis_documentos: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          storage_path: string
+          tamanio: number | null
+          tesis_id: string
+          tipo: string | null
+          user_id: string
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          storage_path: string
+          tamanio?: number | null
+          tesis_id: string
+          tipo?: string | null
+          user_id: string
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          storage_path?: string
+          tamanio?: number | null
+          tesis_id?: string
+          tipo?: string | null
+          user_id?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tesis_documentos_tesis_id_fkey"
+            columns: ["tesis_id"]
+            isOneToOne: false
+            referencedRelation: "tesis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tesis_hitos: {
+        Row: {
+          completado: boolean
+          created_at: string
+          descripcion: string | null
+          fecha_completado: string | null
+          fecha_limite: string
+          id: string
+          tesis_id: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          completado?: boolean
+          created_at?: string
+          descripcion?: string | null
+          fecha_completado?: string | null
+          fecha_limite: string
+          id?: string
+          tesis_id: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          completado?: boolean
+          created_at?: string
+          descripcion?: string | null
+          fecha_completado?: string | null
+          fecha_limite?: string
+          id?: string
+          tesis_id?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tesis_hitos_tesis_id_fkey"
+            columns: ["tesis_id"]
+            isOneToOne: false
+            referencedRelation: "tesis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trabajo_archivos: {
         Row: {
           created_at: string
