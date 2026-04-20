@@ -34,7 +34,7 @@ function MateriasPage() {
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const selectedId = searchParams.selected || null;
-  const setSelectedId = (id: string | null) => navigate({ search: (p) => ({ ...p, selected: id || undefined }) });
+  const setSelectedId = (id: string | null) => navigate({ to: "/materias", search: (p: { selected?: string }) => ({ ...p, selected: id || undefined }) });
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
