@@ -35,7 +35,7 @@ function TesisPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { tab = "capitulos" } = Route.useSearch();
-  const setTab = (t: string) => navigate({ search: { tab: t } });
+  const setTab = (t: string) => navigate({ to: "/tesis", search: { tab: t } as TesisSearch });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
