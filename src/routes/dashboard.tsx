@@ -117,9 +117,30 @@ function DashboardPage() {
           <CardTitle className="font-serif text-xl">Próximas entregas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground py-8 text-center">
-            No hay entregas registradas. Crea materias y trabajos para empezar a verlas aquí.
-          </div>
+          {proximasEntregas.length === 0 ? (
+            <div className="text-sm text-muted-foreground py-8 text-center">
+              No hay entregas próximas. Crea trabajos con fecha de entrega para verlos aquí.
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {proximasEntregas.map((t) => {
+                const fecha = new Date(t.fecha_entrega!);
+                const diff = Math.ceil((fecha.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const urgente = diff <= 3;
+                return (
+                  <li key={t.id} className="py-3 flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{t.titulo}</div>
+                      <div className="text-xs text-muted-foreground">{materiaName(t.materia_id)}</div>
+                    </div>
+                    <div className={`text-sm font-mono ${urgente ? "text-destructive" : "text-muted-foreground"}`}>
+                      {fecha.toLocaleDateString()} · {diff === 0 ? "hoy" : `${diff}d`}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </CardContent>
       </Card>
 
