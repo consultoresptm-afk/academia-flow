@@ -358,3 +358,50 @@ export function TrabajoDetailSheet({
     </Sheet>
   );
 }
+
+/** Tarjeta resumen de una fase del trabajo (Borrador / Revisión / Entrega). */
+function FaseCard({
+  titulo,
+  tone,
+  fecha,
+  items,
+}: {
+  titulo: string;
+  tone: "warning" | "primary" | "success";
+  fecha: string | null | undefined;
+  items: { label: string; value: string | number | null | undefined }[];
+}) {
+  const visibles = items.filter((i) => i.value != null && String(i.value).trim() !== "");
+  const tieneInfo = visibles.length > 0 || !!fecha;
+  const toneClass =
+    tone === "warning" ? "border-l-warning"
+    : tone === "primary" ? "border-l-primary"
+    : "border-l-success";
+
+  return (
+    <div className={`rounded-md border border-border border-l-4 ${toneClass} p-4 bg-card`}>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-medium text-sm">{titulo}</h4>
+        {fecha && (
+          <span className="text-xs text-muted-foreground">
+            {new Date(fecha).toLocaleDateString("es-ES")}
+          </span>
+        )}
+      </div>
+      {tieneInfo ? (
+        <dl className="space-y-1.5 text-sm">
+          {visibles.map((i) => (
+            <div key={i.label} className="grid grid-cols-[100px_1fr] gap-2">
+              <dt className="text-xs text-muted-foreground pt-0.5">{i.label}</dt>
+              <dd className="text-sm whitespace-pre-wrap break-words">{i.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="text-xs text-muted-foreground italic">
+          Sin información registrada para esta fase. Usa "Editar" para completarla.
+        </p>
+      )}
+    </div>
+  );
+}
