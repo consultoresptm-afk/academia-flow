@@ -42,7 +42,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, progr
       <div className="px-4 py-4 border-b border-border flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <BookOpen className="size-4 text-primary" />
-          <span className="font-medium text-sm">Materias</span>
+          <span className="font-medium text-sm">Gestión Académica</span>
           <Badge variant="secondary" className="text-xs">{materias.length}</Badge>
         </div>
         <Button size="sm" onClick={onCreate} className="h-7 px-2 text-xs gap-1">

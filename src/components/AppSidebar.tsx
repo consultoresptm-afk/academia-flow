@@ -10,7 +10,7 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; disabl
 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/materias",  label: "Materias",  icon: BookOpen },
+  { to: "/materias",  label: "Gestión Académica",  icon: BookOpen },
   { to: "/produccion", label: "Producción", icon: FileText },
   { to: "/tesis", label: "Tesis", icon: Microscope },
 ];

@@ -22,7 +22,7 @@ export const Route = createFileRoute("/materias")({
   },
   head: () => ({
     meta: [
-      { title: "Materias — AcadémicoPro" },
+      { title: "Gestión Académica — AcadémicoPro" },
       { name: "description", content: "Gestiona tus materias, calificaciones, tareas y repositorio de archivos." },
     ],
   }),
@@ -116,7 +116,7 @@ function MateriasPage() {
         <div className="w-72 shrink-0 flex flex-col overflow-hidden border-r border-border">
           <div className="px-4 pt-6 pb-2">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">Tu semestre</p>
-            <h1 className="font-serif text-2xl mt-0.5">Materias</h1>
+            <h1 className="font-serif text-2xl mt-0.5">Gestión Académica</h1>
           </div>
           {isLoading ? (
             <div className="flex-1 flex items-center justify-center">
