@@ -232,7 +232,7 @@ function ProduccionPage() {
 
       <TrabajoFormDialog open={formOpen} onOpenChange={setFormOpen} initial={editing} />
       <TrabajoDetailSheet
-        trabajoId={selected}
+        trabajoId={selected ?? null}
         open={!!selected}
         onOpenChange={(v) => !v && setSelected(null)}
         onEdit={handleEdit}
