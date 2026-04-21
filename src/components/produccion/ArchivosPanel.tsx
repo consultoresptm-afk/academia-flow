@@ -72,8 +72,18 @@ export function ArchivosPanel({ trabajoId }: { trabajoId: string }) {
           file = await compressImage(file);
         }
         
-        const path = `${user.id}/${trabajoId}/${Date.now()}-${file.name}`;
-        const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file);
+        // Sanitizar nombre: Supabase Storage solo acepta ASCII en las keys.
+        // Removemos tildes, espacios y caracteres especiales.
+        const safeName = file.name
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^\w.\-]+/g, "_")
+          .replace(/_+/g, "_");
+        const path = `${user.id}/${trabajoId}/${Date.now()}-${safeName}`;
+        const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, {
+          contentType: file.type || "application/octet-stream",
+          upsert: false,
+        });
         if (upErr) throw upErr;
         
         const { error } = await supabase.from("trabajo_archivos").insert({
