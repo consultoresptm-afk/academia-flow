@@ -97,7 +97,7 @@ function DashboardPage() {
         <KPI label="Promedio" value={stats.promedio.toFixed(2)} icon={Trophy} tone="success" />
         <KPI label="Materias activas" value={String(stats.activas)} icon={BookOpen} />
         <KPI label="Trabajos pendientes" value={String(stats.pendientes)} icon={Clock} />
-        <KPI label="Alertas" value="0" icon={AlertTriangle} tone="warning" />
+        <KPI label="Alertas (7 días)" value={String(stats.alertas)} icon={AlertTriangle} tone="warning" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
