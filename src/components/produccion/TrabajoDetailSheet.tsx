@@ -231,12 +231,47 @@ export function TrabajoDetailSheet({
             </SheetHeader>
 
             <div className="mt-6">
-              <Tabs defaultValue="contenido">
-                <TabsList className="grid grid-cols-3 w-full">
+              <Tabs defaultValue="fases">
+                <TabsList className="grid grid-cols-4 w-full">
+                  <TabsTrigger value="fases">Fases</TabsTrigger>
                   <TabsTrigger value="contenido">Contenido</TabsTrigger>
                   <TabsTrigger value="bibliografia">Bibliografía</TabsTrigger>
                   <TabsTrigger value="archivos">Archivos</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="fases" className="space-y-3 mt-4">
+                  <FaseCard
+                    titulo="Borrador"
+                    tone="warning"
+                    fecha={trabajo.borrador_fecha}
+                    items={[
+                      { label: "Notas", value: trabajo.borrador_notas },
+                    ]}
+                  />
+                  <FaseCard
+                    titulo="Revisión"
+                    tone="primary"
+                    fecha={trabajo.revision_fecha}
+                    items={[
+                      { label: "Revisor", value: trabajo.revision_revisor },
+                      { label: "Comentarios", value: trabajo.revision_comentarios },
+                    ]}
+                  />
+                  <FaseCard
+                    titulo="Entrega"
+                    tone="success"
+                    fecha={trabajo.entrega_fecha_real}
+                    items={[
+                      { label: "Medio", value: trabajo.entrega_medio },
+                      { label: "Observaciones", value: trabajo.entrega_observaciones },
+                      { label: "Nota", value: trabajo.nota != null ? `${trabajo.nota} / 100` : null },
+                      { label: "Calificado el", value: trabajo.calificacion_fecha },
+                    ]}
+                  />
+                  <div className="text-xs text-center text-muted-foreground pt-2">
+                    Edita los detalles de cada fase desde el botón <Pencil className="size-3 inline" /> arriba.
+                  </div>
+                </TabsContent>
 
                 <TabsContent value="contenido" className="space-y-4 mt-4">
                   <div className="flex flex-wrap gap-2">
