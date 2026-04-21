@@ -38,11 +38,51 @@ function DashboardPage() {
     },
   });
 
+  const { data: trabajos } = useQuery({
+    enabled: !!user,
+    queryKey: ["trabajos-dashboard", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("trabajos").select("id, titulo, estado, fecha_entrega, nota, peso, materia_id");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const stats = useMemo(() => {
     const total = materias?.length ?? 0;
     const activas = materias?.filter((m) => m.estado === "activa").length ?? 0;
-    return { total, activas, promedio: 4.2, pendientes: 0 };
-  }, [materias]);
+    const pendientes = trabajos?.filter((t) => t.estado !== "entrega").length ?? 0;
+
+    // Promedio ponderado real desde notas
+    const conNota = trabajos?.filter((t) => t.nota != null) ?? [];
+    let promedio = 0;
+    if (conNota.length > 0) {
+      const sumPesos = conNota.reduce((s, t) => s + (Number(t.peso) || 1), 0);
+      const sumNotas = conNota.reduce((s, t) => s + (Number(t.nota) || 0) * (Number(t.peso) || 1), 0);
+      promedio = sumPesos > 0 ? sumNotas / sumPesos : 0;
+    }
+
+    // Alertas: entregas en los próximos 7 días sin entregar
+    const hoy = new Date();
+    const en7 = new Date(); en7.setDate(hoy.getDate() + 7);
+    const alertas = trabajos?.filter((t) => {
+      if (!t.fecha_entrega || t.estado === "entrega") return false;
+      const f = new Date(t.fecha_entrega);
+      return f >= hoy && f <= en7;
+    }).length ?? 0;
+
+    return { total, activas, promedio, pendientes, alertas };
+  }, [materias, trabajos]);
+
+  const proximasEntregas = useMemo(() => {
+    const hoy = new Date();
+    return (trabajos ?? [])
+      .filter((t) => t.fecha_entrega && t.estado !== "entrega" && new Date(t.fecha_entrega) >= hoy)
+      .sort((a, b) => new Date(a.fecha_entrega!).getTime() - new Date(b.fecha_entrega!).getTime())
+      .slice(0, 5);
+  }, [trabajos]);
+
+  const materiaName = (id: string | null) => materias?.find((m) => m.id === id)?.nombre ?? "Sin materia";
 
   if (loading || !user) return null;
 
@@ -57,7 +97,7 @@ function DashboardPage() {
         <KPI label="Promedio" value={stats.promedio.toFixed(2)} icon={Trophy} tone="success" />
         <KPI label="Materias activas" value={String(stats.activas)} icon={BookOpen} />
         <KPI label="Trabajos pendientes" value={String(stats.pendientes)} icon={Clock} />
-        <KPI label="Alertas" value="0" icon={AlertTriangle} tone="warning" />
+        <KPI label="Alertas (7 días)" value={String(stats.alertas)} icon={AlertTriangle} tone="warning" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
@@ -77,9 +117,30 @@ function DashboardPage() {
           <CardTitle className="font-serif text-xl">Próximas entregas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground py-8 text-center">
-            No hay entregas registradas. Crea materias y trabajos para empezar a verlas aquí.
-          </div>
+          {proximasEntregas.length === 0 ? (
+            <div className="text-sm text-muted-foreground py-8 text-center">
+              No hay entregas próximas. Crea trabajos con fecha de entrega para verlos aquí.
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {proximasEntregas.map((t) => {
+                const fecha = new Date(t.fecha_entrega!);
+                const diff = Math.ceil((fecha.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const urgente = diff <= 3;
+                return (
+                  <li key={t.id} className="py-3 flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{t.titulo}</div>
+                      <div className="text-xs text-muted-foreground">{materiaName(t.materia_id)}</div>
+                    </div>
+                    <div className={`text-sm font-mono ${urgente ? "text-destructive" : "text-muted-foreground"}`}>
+                      {fecha.toLocaleDateString()} · {diff === 0 ? "hoy" : `${diff}d`}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </CardContent>
       </Card>
 
