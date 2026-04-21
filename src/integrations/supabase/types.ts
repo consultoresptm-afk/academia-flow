@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      materia_archivos: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          id: string
+          materia_id: string
+          nombre: string
+          storage_path: string
+          tamanio: number | null
+          tipo: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          materia_id: string
+          nombre: string
+          storage_path: string
+          tamanio?: number | null
+          tipo?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          materia_id?: string
+          nombre?: string
+          storage_path?: string
+          tamanio?: number | null
+          tipo?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materia_archivos_materia_id_fkey"
+            columns: ["materia_id"]
+            isOneToOne: false
+            referencedRelation: "materias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       materias: {
         Row: {
           codigo: string | null
