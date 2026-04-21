@@ -231,12 +231,47 @@ export function TrabajoDetailSheet({
             </SheetHeader>
 
             <div className="mt-6">
-              <Tabs defaultValue="contenido">
-                <TabsList className="grid grid-cols-3 w-full">
+              <Tabs defaultValue="fases">
+                <TabsList className="grid grid-cols-4 w-full">
+                  <TabsTrigger value="fases">Fases</TabsTrigger>
                   <TabsTrigger value="contenido">Contenido</TabsTrigger>
                   <TabsTrigger value="bibliografia">Bibliografía</TabsTrigger>
                   <TabsTrigger value="archivos">Archivos</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="fases" className="space-y-3 mt-4">
+                  <FaseCard
+                    titulo="Borrador"
+                    tone="warning"
+                    fecha={trabajo.borrador_fecha}
+                    items={[
+                      { label: "Notas", value: trabajo.borrador_notas },
+                    ]}
+                  />
+                  <FaseCard
+                    titulo="Revisión"
+                    tone="primary"
+                    fecha={trabajo.revision_fecha}
+                    items={[
+                      { label: "Revisor", value: trabajo.revision_revisor },
+                      { label: "Comentarios", value: trabajo.revision_comentarios },
+                    ]}
+                  />
+                  <FaseCard
+                    titulo="Entrega"
+                    tone="success"
+                    fecha={trabajo.entrega_fecha_real}
+                    items={[
+                      { label: "Medio", value: trabajo.entrega_medio },
+                      { label: "Observaciones", value: trabajo.entrega_observaciones },
+                      { label: "Nota", value: trabajo.nota != null ? `${trabajo.nota} / 100` : null },
+                      { label: "Calificado el", value: trabajo.calificacion_fecha },
+                    ]}
+                  />
+                  <div className="text-xs text-center text-muted-foreground pt-2">
+                    Edita los detalles de cada fase desde el botón <Pencil className="size-3 inline" /> arriba.
+                  </div>
+                </TabsContent>
 
                 <TabsContent value="contenido" className="space-y-4 mt-4">
                   <div className="flex flex-wrap gap-2">
@@ -321,5 +356,52 @@ export function TrabajoDetailSheet({
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+/** Tarjeta resumen de una fase del trabajo (Borrador / Revisión / Entrega). */
+function FaseCard({
+  titulo,
+  tone,
+  fecha,
+  items,
+}: {
+  titulo: string;
+  tone: "warning" | "primary" | "success";
+  fecha: string | null | undefined;
+  items: { label: string; value: string | number | null | undefined }[];
+}) {
+  const visibles = items.filter((i) => i.value != null && String(i.value).trim() !== "");
+  const tieneInfo = visibles.length > 0 || !!fecha;
+  const toneClass =
+    tone === "warning" ? "border-l-warning"
+    : tone === "primary" ? "border-l-primary"
+    : "border-l-success";
+
+  return (
+    <div className={`rounded-md border border-border border-l-4 ${toneClass} p-4 bg-card`}>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-medium text-sm">{titulo}</h4>
+        {fecha && (
+          <span className="text-xs text-muted-foreground">
+            {new Date(fecha).toLocaleDateString("es-ES")}
+          </span>
+        )}
+      </div>
+      {tieneInfo ? (
+        <dl className="space-y-1.5 text-sm">
+          {visibles.map((i) => (
+            <div key={i.label} className="grid grid-cols-[100px_1fr] gap-2">
+              <dt className="text-xs text-muted-foreground pt-0.5">{i.label}</dt>
+              <dd className="text-sm whitespace-pre-wrap break-words">{i.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="text-xs text-muted-foreground italic">
+          Sin información registrada para esta fase. Usa "Editar" para completarla.
+        </p>
+      )}
+    </div>
   );
 }

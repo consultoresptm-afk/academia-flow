@@ -122,6 +122,7 @@ function ProduccionPage() {
       id: t.id,
       titulo: t.titulo,
       tipo: t.tipo,
+      estado: t.estado,
       materia_id: t.materia_id,
       descripcion: t.descripcion ?? "",
       instrucciones: t.instrucciones ?? "",
@@ -130,6 +131,16 @@ function ProduccionPage() {
       paginas_estimadas: t.paginas_estimadas ?? 5,
       fecha_entrega: t.fecha_entrega ?? "",
       peso: t.peso?.toString() ?? "",
+      borrador_notas: t.borrador_notas ?? "",
+      borrador_fecha: t.borrador_fecha ?? "",
+      revision_comentarios: t.revision_comentarios ?? "",
+      revision_revisor: t.revision_revisor ?? "",
+      revision_fecha: t.revision_fecha ?? "",
+      entrega_fecha_real: t.entrega_fecha_real ?? "",
+      entrega_medio: t.entrega_medio ?? "",
+      entrega_observaciones: t.entrega_observaciones ?? "",
+      nota: t.nota?.toString() ?? "",
+      calificacion_fecha: t.calificacion_fecha ?? "",
     });
     setSelected(null);
     setFormOpen(true);
