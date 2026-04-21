@@ -38,11 +38,51 @@ function DashboardPage() {
     },
   });
 
+  const { data: trabajos } = useQuery({
+    enabled: !!user,
+    queryKey: ["trabajos-dashboard", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("trabajos").select("id, titulo, estado, fecha_entrega, nota, peso, materia_id");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const stats = useMemo(() => {
     const total = materias?.length ?? 0;
     const activas = materias?.filter((m) => m.estado === "activa").length ?? 0;
-    return { total, activas, promedio: 4.2, pendientes: 0 };
-  }, [materias]);
+    const pendientes = trabajos?.filter((t) => t.estado !== "entrega").length ?? 0;
+
+    // Promedio ponderado real desde notas
+    const conNota = trabajos?.filter((t) => t.nota != null) ?? [];
+    let promedio = 0;
+    if (conNota.length > 0) {
+      const sumPesos = conNota.reduce((s, t) => s + (Number(t.peso) || 1), 0);
+      const sumNotas = conNota.reduce((s, t) => s + (Number(t.nota) || 0) * (Number(t.peso) || 1), 0);
+      promedio = sumPesos > 0 ? sumNotas / sumPesos : 0;
+    }
+
+    // Alertas: entregas en los próximos 7 días sin entregar
+    const hoy = new Date();
+    const en7 = new Date(); en7.setDate(hoy.getDate() + 7);
+    const alertas = trabajos?.filter((t) => {
+      if (!t.fecha_entrega || t.estado === "entrega") return false;
+      const f = new Date(t.fecha_entrega);
+      return f >= hoy && f <= en7;
+    }).length ?? 0;
+
+    return { total, activas, promedio, pendientes, alertas };
+  }, [materias, trabajos]);
+
+  const proximasEntregas = useMemo(() => {
+    const hoy = new Date();
+    return (trabajos ?? [])
+      .filter((t) => t.fecha_entrega && t.estado !== "entrega" && new Date(t.fecha_entrega) >= hoy)
+      .sort((a, b) => new Date(a.fecha_entrega!).getTime() - new Date(b.fecha_entrega!).getTime())
+      .slice(0, 5);
+  }, [trabajos]);
+
+  const materiaName = (id: string | null) => materias?.find((m) => m.id === id)?.nombre ?? "Sin materia";
 
   if (loading || !user) return null;
 
