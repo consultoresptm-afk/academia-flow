@@ -2,16 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   BookOpen, User, Calendar, Star, CheckCircle2, Clock, AlertCircle,
-  FileText, Download, Loader2,
+  FileText,
 } from "lucide-react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-
-const BUCKET = "trabajo-archivos";
+import { NotasTab } from "./NotasTab";
+import { RepositorioTab } from "./RepositorioTab";
 
 type Materia = {
   id: string; nombre: string; codigo: string | null; docente: string | null;
