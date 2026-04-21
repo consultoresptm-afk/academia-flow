@@ -439,10 +439,16 @@ export type Database = {
       }
       trabajos: {
         Row: {
+          borrador_fecha: string | null
+          borrador_notas: string | null
+          calificacion_fecha: string | null
           contenido: string | null
           contenido_humanizado: string | null
           created_at: string
           descripcion: string | null
+          entrega_fecha_real: string | null
+          entrega_medio: string | null
+          entrega_observaciones: string | null
           estado: string
           fecha_entrega: string | null
           id: string
@@ -453,16 +459,25 @@ export type Database = {
           paginas_estimadas: number | null
           palabras_clave: string[] | null
           peso: number | null
+          revision_comentarios: string | null
+          revision_fecha: string | null
+          revision_revisor: string | null
           tipo: string
           titulo: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          borrador_fecha?: string | null
+          borrador_notas?: string | null
+          calificacion_fecha?: string | null
           contenido?: string | null
           contenido_humanizado?: string | null
           created_at?: string
           descripcion?: string | null
+          entrega_fecha_real?: string | null
+          entrega_medio?: string | null
+          entrega_observaciones?: string | null
           estado?: string
           fecha_entrega?: string | null
           id?: string
@@ -473,16 +488,25 @@ export type Database = {
           paginas_estimadas?: number | null
           palabras_clave?: string[] | null
           peso?: number | null
+          revision_comentarios?: string | null
+          revision_fecha?: string | null
+          revision_revisor?: string | null
           tipo?: string
           titulo: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          borrador_fecha?: string | null
+          borrador_notas?: string | null
+          calificacion_fecha?: string | null
           contenido?: string | null
           contenido_humanizado?: string | null
           created_at?: string
           descripcion?: string | null
+          entrega_fecha_real?: string | null
+          entrega_medio?: string | null
+          entrega_observaciones?: string | null
           estado?: string
           fecha_entrega?: string | null
           id?: string
@@ -493,6 +517,9 @@ export type Database = {
           paginas_estimadas?: number | null
           palabras_clave?: string[] | null
           peso?: number | null
+          revision_comentarios?: string | null
+          revision_fecha?: string | null
+          revision_revisor?: string | null
           tipo?: string
           titulo?: string
           updated_at?: string
