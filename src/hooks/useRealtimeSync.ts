@@ -15,9 +15,8 @@ export function useRealtimeSync() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public" },
-        (payload) => {
-          console.log("DB Change:", payload);
-          // Invalidar todas las consultas de React Query para forzar un refetch en tiempo real
+        () => {
+          // Invalidar todas las consultas de React Query para refetch en tiempo real
           qc.invalidateQueries();
         }
       )
