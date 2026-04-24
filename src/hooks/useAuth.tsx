@@ -30,9 +30,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", user.id).single()
       ]);
 
+      const isOwner = user.email === "wmartinezm360@gmail.com" || user.email === "lauradanielagaleanomoton@gmail.com";
+      
+      const profileData: any = pRes.data || {};
+      if (isOwner) {
+        profileData.is_approved = true;
+      }
+
       return {
-        profile: pRes.data,
-        role: rRes.data?.role ?? "estudiante"
+        profile: profileData,
+        role: isOwner ? "admin" : (rRes.data?.role ?? "estudiante")
       };
     },
     enabled: !!user,

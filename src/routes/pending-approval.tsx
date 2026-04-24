@@ -60,8 +60,7 @@ function PendingApproval() {
           <h2 className="text-xl font-semibold mb-3 text-[#fbbf24]">Acceso en espera</h2>
           <p className="text-sm text-[#d4a574]/70 mb-6 leading-relaxed">
             Hola <span className="text-[#fbbf24] font-medium">{user.email}</span>. 
-            Tu solicitud de acceso está siendo revisada por el propietario del sistema. 
-            Recibirás acceso una vez que seas aprobado.
+            Tu solicitud de acceso está en espera. Por favor, solicita autorización directamente al propietario del sistema en <a href="mailto:wmartinezm360@gmail.com" className="text-[#f59e0b] hover:underline font-medium">wmartinezm360@gmail.com</a>.
           </p>
           
           <Button
