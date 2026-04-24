@@ -81,7 +81,14 @@ export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
     // SSR fallback — provider mounts on client
-    return { user: null, session: null, loading: true, signOut: async () => {} } satisfies AuthContextValue;
+    return { 
+      user: null, 
+      session: null, 
+      profile: null, 
+      role: null, 
+      loading: true, 
+      signOut: async () => {} 
+    } satisfies AuthContextValue;
   }
   return ctx;
 }
