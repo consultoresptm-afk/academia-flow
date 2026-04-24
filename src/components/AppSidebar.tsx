@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard, BookOpen, FileText, Microscope,
-  LogOut, GraduationCap, Zap,
+  LogOut, GraduationCap, Zap, Shield
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -116,6 +116,34 @@ export function AppSidebar() {
             </Link>
           );
         })}
+        {/* Sección Admin */}
+        {role === "admin" && (
+          <>
+            <p className="text-[10px] uppercase tracking-widest px-3 pb-2 pt-4"
+              style={{ color: "rgba(245, 158, 11, 0.6)" }}>
+              Configuración
+            </p>
+            <Link
+              to="/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded text-xs uppercase tracking-wider transition-all group"
+              style={
+                pathname === "/admin"
+                  ? {
+                      background: "rgba(245, 158, 11, 0.15)",
+                      color: "#fbbf24",
+                      borderLeft: "2px solid #f59e0b",
+                    }
+                  : {
+                      color: "rgba(212, 165, 116, 0.7)",
+                      borderLeft: "2px solid transparent",
+                    }
+              }
+            >
+              <Shield className="size-4 shrink-0 transition-all" />
+              <span className="flex-1">Administración</span>
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* ── Usuario / Cierre de sesión ── */}
@@ -124,8 +152,13 @@ export function AppSidebar() {
           className="px-3 py-2 mb-2 rounded"
           style={{ background: "rgba(74, 4, 4, 0.4)", border: "1px solid rgba(245, 158, 11, 0.1)" }}
         >
-          <div className="text-[10px] uppercase tracking-wider" style={{ color: "rgba(212, 165, 116, 0.5)" }}>
-            Conectado como
+          <div className="text-[10px] uppercase tracking-wider flex items-center justify-between" style={{ color: "rgba(212, 165, 116, 0.5)" }}>
+            <span>Conectado como</span>
+            {role === "admin" && (
+              <span className="text-[9px] px-1 bg-primary/20 text-primary rounded border border-primary/20 font-bold">
+                ADMIN
+              </span>
+            )}
           </div>
           <div className="text-xs truncate mt-0.5" style={{ color: "#d4a574" }}>
             {user?.email}

@@ -74,10 +74,50 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 function RealtimeSync() {
   useRealtimeSync();
   return null;
+}
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+  const { location } = useRouterState();
+  
+  useEffect(() => {
+    if (loading) return;
+
+    const isAuthPage = location.pathname === "/auth";
+    const isPendingPage = location.pathname === "/pending-approval";
+    
+    if (!user && !isAuthPage) {
+      navigate({ to: "/auth" });
+      return;
+    }
+
+    if (user && !profile?.is_approved && !isPendingPage && !isAuthPage) {
+      navigate({ to: "/pending-approval" });
+      return;
+    }
+
+    if (user && profile?.is_approved && isPendingPage) {
+      navigate({ to: "/dashboard" });
+    }
+  }, [user, profile, loading, location.pathname, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#1a0505]">
+        <div className="size-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }
 
 function RootComponent() {
@@ -87,9 +127,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RealtimeSync />
-        <Outlet />
-        <Toaster richColors position="top-right" />
+        <AuthGuard>
+          <RealtimeSync />
+          <Outlet />
+          <Toaster richColors position="top-right" />
+        </AuthGuard>
       </AuthProvider>
     </QueryClientProvider>
   );
