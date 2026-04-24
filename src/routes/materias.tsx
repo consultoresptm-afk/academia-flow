@@ -36,6 +36,17 @@ function MateriasPage() {
   const selectedId = searchParams.selected || null;
   const setSelectedId = (id: string | null) => navigate({ to: "/materias", search: (p: { selected?: string }) => ({ ...p, selected: id || undefined }) });
   const [formOpen, setFormOpen] = useState(false);
+  const [editingMateria, setEditingMateria] = useState<any | null>(null);
+
+  const handleCreate = () => {
+    setEditingMateria(null);
+    setFormOpen(true);
+  };
+
+  const handleEdit = (materia: any) => {
+    setEditingMateria(materia);
+    setFormOpen(true);
+  };
 
 
   // Cargar materias
@@ -124,7 +135,8 @@ function MateriasPage() {
               materias={materias}
               selectedId={selectedId}
               onSelect={setSelectedId}
-              onCreate={() => setFormOpen(true)}
+              onCreate={handleCreate}
+              onEdit={handleEdit}
               progresos={progresos}
             />
           )}
@@ -157,6 +169,7 @@ function MateriasPage() {
           open={formOpen}
           onOpenChange={setFormOpen}
           userId={user.id}
+          materia={editingMateria}
         />
       )}
     </div>

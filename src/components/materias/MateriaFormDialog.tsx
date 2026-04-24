@@ -8,23 +8,72 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const COLORS = ["#16a34a", "#0891b2", "#7c3aed", "#dc2626", "#d97706", "#0284c7", "#db2777", "#ea580c"];
 
-type Props = { open: boolean; onOpenChange: (v: boolean) => void; userId: string };
+type Props = {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  userId: string;
+  materia?: any;
+};
 
-export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
+export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
     nombre: "", codigo: "", docente: "", creditos: 3,
     semestre: "", color: COLORS[0], descripcion: "",
+    estado: "Materia Activa",
+  });
+
+  const isEditing = !!materia;
+
+  // Reset form when opening or changing materia
+  useState(() => {
+    if (materia) {
+      setForm({
+        nombre: materia.nombre || "",
+        codigo: materia.codigo || "",
+        docente: materia.docente || "",
+        creditos: materia.creditos || 3,
+        semestre: materia.semestre || "",
+        color: materia.color || COLORS[0],
+        descripcion: materia.descripcion || "",
+        estado: materia.estado || "Materia Activa",
+      });
+    }
+  });
+
+  // Since useState with a function only runs on mount, we need an effect or handle it on open
+  useState(() => {
+    if (open && materia) {
+       setForm({
+        nombre: materia.nombre || "",
+        codigo: materia.codigo || "",
+        docente: materia.docente || "",
+        creditos: materia.creditos || 3,
+        semestre: materia.semestre || "",
+        color: materia.color || COLORS[0],
+        descripcion: materia.descripcion || "",
+        estado: materia.estado || "Materia Activa",
+      });
+    } else if (open && !materia) {
+      setForm({
+        nombre: "", codigo: "", docente: "", creditos: 3,
+        semestre: "", color: COLORS[0], descripcion: "",
+        estado: "Materia Activa",
+      });
+    }
   });
 
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("materias").insert({
+      const payload = {
         user_id: userId,
         nombre: form.nombre,
         codigo: form.codigo || null,
@@ -33,15 +82,21 @@ export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
         semestre: form.semestre || null,
         color: form.color,
         descripcion: form.descripcion || null,
-        estado: "activa",
-      });
-      if (error) throw error;
+        estado: form.estado,
+      };
+
+      if (isEditing) {
+        const { error } = await supabase.from("materias").update(payload).eq("id", materia.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("materias").insert(payload);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      toast.success("Materia creada");
+      toast.success(isEditing ? "Materia actualizada" : "Materia creada");
       qc.invalidateQueries({ queryKey: ["materias"] });
       onOpenChange(false);
-      setForm({ nombre: "", codigo: "", docente: "", creditos: 3, semestre: "", color: COLORS[0], descripcion: "" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -50,7 +105,10 @@ export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">Nueva materia</DialogTitle>
+          <DialogTitle className="font-serif text-2xl flex items-center gap-2">
+            {isEditing ? <Pencil className="size-5" /> : <Plus className="size-5" />}
+            {isEditing ? "Editar materia" : "Nueva materia"}
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -83,6 +141,19 @@ export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
             </div>
           </div>
           <div>
+            <Label htmlFor="mat-estado">Estado</Label>
+            <Select value={form.estado} onValueChange={(v) => setForm({ ...form, estado: v })}>
+              <SelectTrigger id="mat-estado">
+                <SelectValue placeholder="Selecciona un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Materia Activa">Materia Activa</SelectItem>
+                <SelectItem value="Materia Consolidada">Materia Consolidada</SelectItem>
+                <SelectItem value="Materia En Progreso">Materia En Progreso</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <Label>Color de identificación</Label>
             <div className="flex gap-2 mt-2">
               {COLORS.map((c) => (
@@ -102,7 +173,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId }: Props) {
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={() => save.mutate()} disabled={!form.nombre || save.isPending}>
             {save.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
-            Crear materia
+            {isEditing ? "Guardar cambios" : "Crear materia"}
           </Button>
         </DialogFooter>
       </DialogContent>

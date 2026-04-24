@@ -13,6 +13,8 @@ import { Plus, Pencil, Trash2, Star } from "lucide-react";
 import { toast } from "sonner";
 
 const TIPOS = ["parcial", "quiz", "ensayo", "informe", "proyecto", "tarea", "examen final", "exposición"];
+const TRAYECTOS = [1, 2, 3];
+const ACTIVIDADES = ["Autogestionable", "Actividad Entregable", "Puntos Adicionales", "Autoevaluación"];
 
 type NotaRow = {
   id: string;
@@ -20,6 +22,9 @@ type NotaRow = {
   tipo: string;
   nota: number | null;
   peso: number | null;
+  trayecto: number | null;
+  tipo_actividad: string | null;
+  documento_url: string | null;
 };
 
 export function NotasTab({ materiaId }: { materiaId: string }) {
@@ -27,14 +32,20 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<NotaRow | null>(null);
-  const [form, setForm] = useState({ titulo: "", tipo: "parcial", nota: "", peso: "" });
+  const [form, setForm] = useState({
+    titulo: "", tipo: "parcial", nota: "", peso: "",
+    trayecto: "1", tipo_actividad: "Autogestionable",
+    documento_url: ""
+  });
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { data: trabajos = [], isLoading } = useQuery({
     queryKey: ["materia-notas", materiaId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trabajos")
-        .select("id, titulo, tipo, nota, peso")
+        .select("id, titulo, tipo, nota, peso, trayecto, tipo_actividad, documento_url")
         .eq("materia_id", materiaId)
         .order("created_at", { ascending: true });
       if (error) throw error;
@@ -44,16 +55,37 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
 
   const save = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error("No autenticado");
-      if (!form.titulo.trim()) throw new Error("El título es obligatorio");
+      let finalDocUrl = form.documento_url;
+
+      if (file && form.tipo_actividad === "Actividad Entregable") {
+        setIsUploading(true);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${user.id}/${materiaId}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('materia-archivos')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          setIsUploading(false);
+          throw uploadError;
+        }
+        finalDocUrl = filePath;
+      }
+
       const payload = {
         titulo: form.titulo.trim(),
         tipo: form.tipo,
         nota: form.nota === "" ? null : Number(form.nota),
         peso: form.peso === "" ? null : Number(form.peso),
+        trayecto: Number(form.trayecto),
+        tipo_actividad: form.tipo_actividad,
+        documento_url: finalDocUrl,
         materia_id: materiaId,
         user_id: user.id,
       };
+
       if (editing) {
         const { error } = await supabase.from("trabajos").update(payload).eq("id", editing.id);
         if (error) throw error;
@@ -61,13 +93,19 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
         const { error } = await supabase.from("trabajos").insert(payload);
         if (error) throw error;
       }
+      setIsUploading(false);
     },
     onSuccess: () => {
       toast.success(editing ? "Nota actualizada" : "Evaluación registrada");
       qc.invalidateQueries({ queryKey: ["materia-notas", materiaId] });
       qc.invalidateQueries({ queryKey: ["trabajos-todas-notas"] });
       setOpen(false); setEditing(null);
-      setForm({ titulo: "", tipo: "parcial", nota: "", peso: "" });
+      setForm({
+        titulo: "", tipo: "parcial", nota: "", peso: "",
+        trayecto: "1", tipo_actividad: "Autogestionable",
+        documento_url: ""
+      });
+      setFile(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -87,7 +125,12 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
 
   const openNew = () => {
     setEditing(null);
-    setForm({ titulo: "", tipo: "parcial", nota: "", peso: "" });
+    setForm({
+      titulo: "", tipo: "parcial", nota: "", peso: "",
+      trayecto: "1", tipo_actividad: "Autogestionable",
+      documento_url: ""
+    });
+    setFile(null);
     setOpen(true);
   };
   const openEdit = (t: NotaRow) => {
@@ -96,7 +139,11 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
       titulo: t.titulo, tipo: t.tipo,
       nota: t.nota?.toString() ?? "",
       peso: t.peso?.toString() ?? "",
+      trayecto: t.trayecto?.toString() ?? "1",
+      tipo_actividad: t.tipo_actividad ?? "Autogestionable",
+      documento_url: t.documento_url ?? ""
     });
+    setFile(null);
     setOpen(true);
   };
 
@@ -152,6 +199,8 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
             <thead className="bg-muted/40">
               <tr>
                 <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Evaluación</th>
+                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Trayecto</th>
+                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Tipo Actividad</th>
                 <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Tipo</th>
                 <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Peso</th>
                 <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Nota</th>
@@ -161,7 +210,21 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
             <tbody className="divide-y divide-border">
               {trabajos.map((t) => (
                 <tr key={t.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 font-medium">{t.titulo}</td>
+                  <td className="px-4 py-3 font-medium">
+                    {t.titulo}
+                    {t.documento_url && (
+                      <a href={`${supabase.storage.from('materia-archivos').getPublicUrl(t.documento_url).data.publicUrl}`} 
+                         target="_blank" rel="noreferrer" className="block text-[10px] text-primary hover:underline mt-0.5">
+                        Ver documento
+                      </a>
+                    )}
+                  </td>
+                  <td className="px-3 py-3 text-center">
+                    <Badge variant="outline" className="text-xs">T{t.trayecto}</Badge>
+                  </td>
+                  <td className="px-3 py-3 text-center text-xs text-muted-foreground">
+                    {t.tipo_actividad}
+                  </td>
                   <td className="px-3 py-3 text-center">
                     <Badge variant="secondary" className="capitalize text-xs">{t.tipo}</Badge>
                   </td>
@@ -203,8 +266,31 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
               <Label>Título *</Label>
               <Input value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} placeholder="Parcial 1, Quiz Capítulo 3..." />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Trayecto</Label>
+                <Select value={form.trayecto} onValueChange={(v) => setForm({ ...form, trayecto: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{TRAYECTOS.map((t) => <SelectItem key={t} value={t.toString()}>Trayecto {t}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tipo de Actividad</Label>
+                <Select value={form.tipo_actividad} onValueChange={(v) => setForm({ ...form, tipo_actividad: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{ACTIVIDADES.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+            {form.tipo_actividad === "Actividad Entregable" && (
+              <div>
+                <Label>Documento entregable</Label>
+                <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-xs" />
+                {form.documento_url && <p className="text-[10px] text-muted-foreground mt-1">Ya tiene un archivo asociado.</p>}
+              </div>
+            )}
             <div>
-              <Label>Tipo</Label>
+              <Label>Categoría (Tipo)</Label>
               <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>{TIPOS.map((t) => <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>)}</SelectContent>
@@ -227,8 +313,8 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={() => save.mutate()} disabled={save.isPending || !form.titulo.trim()}>
-              {save.isPending ? "Guardando..." : "Guardar"}
+            <Button onClick={() => save.mutate()} disabled={save.isPending || isUploading || !form.titulo.trim()}>
+              {save.isPending || isUploading ? "Guardando..." : "Guardar"}
             </Button>
           </DialogFooter>
         </DialogContent>

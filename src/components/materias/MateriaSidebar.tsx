@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Plus, User, BookOpen, Trash2 } from "lucide-react";
+import { Plus, User, BookOpen, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +17,12 @@ type Props = {
   selectedId: string | null;
   onSelect: (id: string) => void;
   onCreate: () => void;
+  onEdit: (materia: Materia) => void;
   /** Progreso calculado externamente: materia_id → promedio 0-100 */
   progresos?: Record<string, number>;
 };
 
-export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, progresos = {} }: Props) {
+export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdit, progresos = {} }: Props) {
   const qc = useQueryClient();
 
   const removeMutation = useMutation({
@@ -99,17 +100,29 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, progr
                   </span>
                 </div>
 
-                {/* Botón eliminar (solo hover) */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm(`¿Eliminar "${m.nombre}"?`)) removeMutation.mutate(m.id);
-                  }}
-                  className="absolute right-2 top-2 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 text-destructive"
-                  aria-label="Eliminar materia"
-                >
-                  <Trash2 className="size-3" />
-                </button>
+                {/* Botones acciones (solo hover) */}
+                <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(m);
+                    }}
+                    className="p-1 rounded hover:bg-muted text-muted-foreground transition-colors"
+                    aria-label="Editar materia"
+                  >
+                    <Pencil className="size-3" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`¿Eliminar "${m.nombre}"?`)) removeMutation.mutate(m.id);
+                    }}
+                    className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors"
+                    aria-label="Eliminar materia"
+                  >
+                    <Trash2 className="size-3" />
+                  </button>
+                </div>
               </div>
             );
           })
