@@ -24,9 +24,6 @@ function DashboardPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   const { data: materias } = useQuery({
     enabled: !!user,

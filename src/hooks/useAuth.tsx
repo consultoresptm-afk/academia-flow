@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 type AuthContextValue = {
   user: User | null;
@@ -16,54 +17,41 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<any | null>(null);
-  const [role, setRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data: pData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
+  // Perfil con React Query para caching y velocidad
+  const { data: profileData, isLoading: profileLoading } = useQuery({
+    queryKey: ["user-profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
       
-      const { data: rData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .single();
+      const [pRes, rRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id).single(),
+        supabase.from("user_roles").select("role").eq("user_id", user.id).single()
+      ]);
 
-      setProfile(pData);
-      setRole(rData?.role ?? "estudiante");
-    } catch (err) {
-      console.error("Error fetching profile:", err);
-    }
-  };
+      return {
+        profile: pRes.data,
+        role: rRes.data?.role ?? "estudiante"
+      };
+    },
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+  });
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    // Escuchar cambios de auth una sola vez
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
-      const newUser = newSession?.user ?? null;
-      setUser(newUser);
-      
-      if (newUser) {
-        await fetchProfile(newUser.id);
-      } else {
-        setProfile(null);
-        setRole(null);
-      }
-      setLoading(false);
+      setUser(newSession?.user ?? null);
+      setAuthLoading(false);
     });
 
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
+    // Sesión inicial
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
-      const initialUser = s?.user ?? null;
-      setUser(initialUser);
-      if (initialUser) {
-        await fetchProfile(initialUser.id);
-      }
-      setLoading(false);
+      setUser(s?.user ?? null);
+      setAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -73,8 +61,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const loading = authLoading || (!!user && profileLoading);
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, role, loading, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      profile: profileData?.profile || null, 
+      role: profileData?.role || null, 
+      loading, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

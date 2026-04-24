@@ -94,22 +94,27 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     const isAuthPage = location.pathname === "/auth";
     const isPendingPage = location.pathname === "/pending-approval";
     
+    // 1. No hay usuario -> ir a Login
     if (!user && !isAuthPage) {
       navigate({ to: "/auth" });
       return;
     }
 
+    // 2. Hay usuario pero no aprobado -> ir a espera
     if (user && !profile?.is_approved && !isPendingPage && !isAuthPage) {
       navigate({ to: "/pending-approval" });
       return;
     }
 
+    // 3. Usuario aprobado en página de espera -> ir a Dashboard
     if (user && profile?.is_approved && isPendingPage) {
       navigate({ to: "/dashboard" });
     }
   }, [user, profile, loading, location.pathname, navigate]);
 
-  if (loading) {
+  // Solo mostrar el spinner de pantalla completa en la carga inicial crítica
+  // Si ya tenemos usuario, permitimos renderizar el layout para evitar parpadeos
+  if (loading && !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#1a0505]">
         <div className="size-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />

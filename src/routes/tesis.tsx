@@ -37,9 +37,6 @@ function TesisPage() {
   const { tab = "capitulos" } = Route.useSearch();
   const setTab = (t: string) => navigate({ to: "/tesis", search: { tab: t } as TesisSearch });
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   const { data: tesis, isLoading } = useQuery({
     enabled: !!user,

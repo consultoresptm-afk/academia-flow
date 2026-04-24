@@ -64,9 +64,6 @@ function ProduccionPage() {
   const setFilterFecha = (f: string) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, fecha: f }) });
   const setTab = (t: string) => navigate({ to: "/produccion", search: (p: ProduccionSearch) => ({ ...p, tab: t }) });
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   const { data: trabajos } = useQuery({
     enabled: !!user,

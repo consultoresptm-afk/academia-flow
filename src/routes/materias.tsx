@@ -37,9 +37,6 @@ function MateriasPage() {
   const setSelectedId = (id: string | null) => navigate({ to: "/materias", search: (p: { selected?: string }) => ({ ...p, selected: id || undefined }) });
   const [formOpen, setFormOpen] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
 
   // Cargar materias
   const { data: materias = [], isLoading } = useQuery({
