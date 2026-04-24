@@ -109,6 +109,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          is_approved: boolean
           programa: string | null
           semestre: number | null
           updated_at: string
@@ -119,6 +120,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_approved?: boolean
           programa?: string | null
           semestre?: number | null
           updated_at?: string
@@ -129,6 +131,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_approved?: boolean
           programa?: string | null
           semestre?: number | null
           updated_at?: string
