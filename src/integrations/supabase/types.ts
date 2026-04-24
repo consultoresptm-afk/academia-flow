@@ -449,6 +449,7 @@ export type Database = {
           contenido_humanizado: string | null
           created_at: string
           descripcion: string | null
+          documento_url: string | null
           entrega_fecha_real: string | null
           entrega_medio: string | null
           entrega_observaciones: string | null
@@ -466,7 +467,9 @@ export type Database = {
           revision_fecha: string | null
           revision_revisor: string | null
           tipo: string
+          tipo_actividad: string | null
           titulo: string
+          trayecto: number | null
           updated_at: string
           user_id: string
         }
@@ -478,6 +481,7 @@ export type Database = {
           contenido_humanizado?: string | null
           created_at?: string
           descripcion?: string | null
+          documento_url?: string | null
           entrega_fecha_real?: string | null
           entrega_medio?: string | null
           entrega_observaciones?: string | null
@@ -495,7 +499,9 @@ export type Database = {
           revision_fecha?: string | null
           revision_revisor?: string | null
           tipo?: string
+          tipo_actividad?: string | null
           titulo: string
+          trayecto?: number | null
           updated_at?: string
           user_id: string
         }
@@ -507,6 +513,7 @@ export type Database = {
           contenido_humanizado?: string | null
           created_at?: string
           descripcion?: string | null
+          documento_url?: string | null
           entrega_fecha_real?: string | null
           entrega_medio?: string | null
           entrega_observaciones?: string | null
@@ -524,7 +531,9 @@ export type Database = {
           revision_fecha?: string | null
           revision_revisor?: string | null
           tipo?: string
+          tipo_actividad?: string | null
           titulo?: string
+          trayecto?: number | null
           updated_at?: string
           user_id?: string
         }

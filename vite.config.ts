@@ -20,13 +20,6 @@ export default defineConfig({
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            "react-vendor": ["react", "react-dom"],
-            "tanstack": ["@tanstack/react-router", "@tanstack/react-query"],
-            "supabase": ["@supabase/supabase-js"],
-            "ui-icons": ["lucide-react"],
-            "charts": ["recharts"],
-          },
         },
       },
     },

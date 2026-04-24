@@ -17,7 +17,7 @@ const NAV: NavItem[] = [
 
 export function AppSidebar() {
   const { pathname } = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
 
   return (
     <aside

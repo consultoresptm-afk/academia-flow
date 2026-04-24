@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TesisRouteImport } from './routes/tesis'
 import { Route as ProduccionRouteImport } from './routes/produccion'
+import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as MateriasRouteImport } from './routes/materias'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TesisRoute = TesisRouteImport.update({
@@ -24,6 +26,11 @@ const TesisRoute = TesisRouteImport.update({
 const ProduccionRoute = ProduccionRouteImport.update({
   id: '/produccion',
   path: '/produccion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingApprovalRoute = PendingApprovalRouteImport.update({
+  id: '/pending-approval',
+  path: '/pending-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MateriasRoute = MateriasRouteImport.update({
@@ -41,6 +48,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,26 +61,32 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/produccion': typeof ProduccionRoute
   '/tesis': typeof TesisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/produccion': typeof ProduccionRoute
   '/tesis': typeof TesisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/materias': typeof MateriasRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/produccion': typeof ProduccionRoute
   '/tesis': typeof TesisRoute
 }
@@ -76,28 +94,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/dashboard'
     | '/materias'
+    | '/pending-approval'
     | '/produccion'
     | '/tesis'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/materias' | '/produccion' | '/tesis'
-  id:
-    | '__root__'
+  to:
     | '/'
+    | '/admin'
     | '/auth'
     | '/dashboard'
     | '/materias'
+    | '/pending-approval'
+    | '/produccion'
+    | '/tesis'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/materias'
+    | '/pending-approval'
     | '/produccion'
     | '/tesis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   MateriasRoute: typeof MateriasRoute
+  PendingApprovalRoute: typeof PendingApprovalRoute
   ProduccionRoute: typeof ProduccionRoute
   TesisRoute: typeof TesisRoute
 }
@@ -116,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/produccion'
       fullPath: '/produccion'
       preLoaderRoute: typeof ProduccionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-approval': {
+      id: '/pending-approval'
+      path: '/pending-approval'
+      fullPath: '/pending-approval'
+      preLoaderRoute: typeof PendingApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/materias': {
@@ -139,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,9 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   MateriasRoute: MateriasRoute,
+  PendingApprovalRoute: PendingApprovalRoute,
   ProduccionRoute: ProduccionRoute,
   TesisRoute: TesisRoute,
 }

@@ -61,6 +61,7 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
         setIsUploading(true);
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
+        if (!user) throw new Error("No autenticado");
         const filePath = `${user.id}/${materiaId}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -83,7 +84,7 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
         tipo_actividad: form.tipo_actividad,
         documento_url: finalDocUrl,
         materia_id: materiaId,
-        user_id: user.id,
+        user_id: user?.id || "",
       };
 
       if (editing) {
