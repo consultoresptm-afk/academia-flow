@@ -11,6 +11,26 @@ type Materia = {
   semestre: string | null; descripcion: string | null;
 };
 
+function materiaEstadoLabel(estado: string) {
+  switch (estado) {
+    case "activa":
+      return "Activa";
+    case "en_progreso":
+      return "En progreso";
+    case "consolidada":
+      return "Consolidada";
+    // Backward compat
+    case "Materia Activa":
+      return "Activa";
+    case "Materia En Progreso":
+      return "En progreso";
+    case "Materia Consolidada":
+      return "Consolidada";
+    default:
+      return estado;
+  }
+}
+
 export function MateriaDetailPanel({ materia }: { materia: Materia }) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -20,7 +40,9 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="font-serif text-2xl font-semibold truncate">{materia.nombre}</h2>
-              <Badge variant={materia.estado === "activa" ? "default" : "secondary"}>{materia.estado}</Badge>
+              <Badge variant={materia.estado === "activa" ? "default" : "secondary"}>
+                {materiaEstadoLabel(materia.estado)}
+              </Badge>
             </div>
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               {materia.codigo && (

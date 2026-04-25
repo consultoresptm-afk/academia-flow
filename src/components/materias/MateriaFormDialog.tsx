@@ -16,6 +16,17 @@ import { toast } from "sonner";
 
 const COLORS = ["#16a34a", "#0891b2", "#7c3aed", "#dc2626", "#d97706", "#0284c7", "#db2777", "#ea580c"];
 
+type MateriaEstado = "activa" | "consolidada" | "en_progreso";
+
+function normalizeMateriaEstado(input: unknown): MateriaEstado {
+  if (input === "activa" || input === "consolidada" || input === "en_progreso") return input;
+  // Backward compat: older UI labels
+  if (input === "Materia Activa") return "activa";
+  if (input === "Materia Consolidada") return "consolidada";
+  if (input === "Materia En Progreso") return "en_progreso";
+  return "activa";
+}
+
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -28,7 +39,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
   const [form, setForm] = useState({
     nombre: "", codigo: "", docente: "", creditos: 3,
     semestre: "", color: COLORS[0], descripcion: "",
-    estado: "Materia Activa",
+    estado: "activa" as MateriaEstado,
   });
 
   const isEditing = !!materia;
@@ -44,7 +55,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
         semestre: materia.semestre || "",
         color: materia.color || COLORS[0],
         descripcion: materia.descripcion || "",
-        estado: materia.estado || "Materia Activa",
+        estado: normalizeMateriaEstado(materia.estado),
       });
     }
   });
@@ -60,13 +71,13 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
         semestre: materia.semestre || "",
         color: materia.color || COLORS[0],
         descripcion: materia.descripcion || "",
-        estado: materia.estado || "Materia Activa",
+        estado: normalizeMateriaEstado(materia.estado),
       });
     } else if (open && !materia) {
       setForm({
         nombre: "", codigo: "", docente: "", creditos: 3,
         semestre: "", color: COLORS[0], descripcion: "",
-        estado: "Materia Activa",
+        estado: "activa" as MateriaEstado,
       });
     }
   });
@@ -142,14 +153,17 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
           </div>
           <div>
             <Label htmlFor="mat-estado">Estado</Label>
-            <Select value={form.estado} onValueChange={(v) => setForm({ ...form, estado: v })}>
+            <Select
+              value={form.estado}
+              onValueChange={(v) => setForm({ ...form, estado: v as MateriaEstado })}
+            >
               <SelectTrigger id="mat-estado">
                 <SelectValue placeholder="Selecciona un estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Materia Activa">Materia Activa</SelectItem>
-                <SelectItem value="Materia Consolidada">Materia Consolidada</SelectItem>
-                <SelectItem value="Materia En Progreso">Materia En Progreso</SelectItem>
+                <SelectItem value="activa">Activa</SelectItem>
+                <SelectItem value="en_progreso">En progreso</SelectItem>
+                <SelectItem value="consolidada">Consolidada</SelectItem>
               </SelectContent>
             </Select>
           </div>
