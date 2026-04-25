@@ -2,21 +2,21 @@ import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { n as cn, t as Button } from "./button-DVyqAt4Q.mjs";
 import { t as Input } from "./input-DW4PzhPm.mjs";
 import { m as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { C as LoaderCircle, F as CircleCheck, H as Calendar, I as CircleAlert, M as Download, N as Clock, U as BookOpen, _ as Plus, a as User, d as Trash2, j as FileText, k as FolderOpen, p as Star, s as Upload, v as Pencil } from "../_libs/lucide-react.mjs";
-import { t as AppSidebar } from "./AppSidebar-C1uvycgQ.mjs";
+import { t as AppSidebar } from "./AppSidebar-CRfsJLX1.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { t as Label } from "./label-DltKm6Et.mjs";
 import { i as TabsTrigger, n as TabsContent, r as TabsList, t as Tabs } from "./tabs-Bcy6-nCM.mjs";
 import { n as CardContent, t as Card } from "./card-qCpth4Ah.mjs";
-import { t as Route } from "./materias-Cnq3GOfA.mjs";
+import { t as Route } from "./materias-CScC8ORw.mjs";
 import { a as DialogHeader, i as DialogFooter, n as Dialog, o as DialogTitle, r as DialogContent, s as Textarea, t as Badge } from "./textarea-CLyuidcl.mjs";
 import { t as Progress } from "./progress-CZD-ZMJu.mjs";
 import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./select-K1gXOkVT.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/materias-BMhNGNs9.js
+//#region node_modules/.nitro/vite/services/ssr/assets/materias-Cxt2Qzig.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdit, progresos = {} }) {

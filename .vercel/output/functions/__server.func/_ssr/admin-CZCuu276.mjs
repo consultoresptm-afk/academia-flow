@@ -2,14 +2,14 @@ import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as Button } from "./button-DVyqAt4Q.mjs";
 import { t as Input } from "./input-DW4PzhPm.mjs";
 import { p as Navigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { B as Check, I as CircleAlert, b as Mail, g as Search, h as Shield, i as Users, n as X, o as UserCheck } from "../_libs/lucide-react.mjs";
-import { t as AppSidebar } from "./AppSidebar-C1uvycgQ.mjs";
+import { t as AppSidebar } from "./AppSidebar-CRfsJLX1.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/admin-DjESaklL.js
+//#region node_modules/.nitro/vite/services/ssr/assets/admin-CZCuu276.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function AdminPanel() {

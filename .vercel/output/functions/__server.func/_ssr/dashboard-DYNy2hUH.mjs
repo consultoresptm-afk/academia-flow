@@ -2,13 +2,13 @@ import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { n as useQuery } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { c as Outlet, m as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { N as Clock, U as BookOpen, V as ChartNoAxesColumn, c as Trophy, l as TriangleAlert } from "../_libs/lucide-react.mjs";
-import { t as AppShell } from "./AppShell-CBLsldfO.mjs";
+import { t as AppShell } from "./AppShell-BNZVYEEj.mjs";
 import { i as CardTitle, n as CardContent, r as CardHeader, t as Card } from "./card-qCpth4Ah.mjs";
 import { a as CartesianGrid, c as Tooltip, i as Line, n as YAxis, o as ReferenceLine, r as XAxis, s as ResponsiveContainer, t as LineChart } from "../_libs/recharts+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/dashboard-KxuUBI5c.js
+//#region node_modules/.nitro/vite/services/ssr/assets/dashboard-DYNy2hUH.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 /**

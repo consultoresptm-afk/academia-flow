@@ -937,7 +937,7 @@ var baseManifestPromise;
 var cachedFinalManifestPromise;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-DM3BELJC.mjs"),
+		import("./router-Cx_fRLYR.mjs"),
 		import("./start-DkBWIoco.mjs"),
 		import("../__23tanstack-start-plugin-adapters-y_fshQDY.mjs")
 	]);

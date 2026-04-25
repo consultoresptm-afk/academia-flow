@@ -1,9 +1,9 @@
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as Button } from "./button-DVyqAt4Q.mjs";
 import { p as Navigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { N as Clock, O as GraduationCap, x as LogOut } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/pending-approval-xS-GsZuv.js
+//#region node_modules/.nitro/vite/services/ssr/assets/pending-approval-BxGN7mDi.js
 var import_jsx_runtime = require_jsx_runtime();
 function PendingApproval() {
 	const { user, profile, signOut, loading } = useAuth();

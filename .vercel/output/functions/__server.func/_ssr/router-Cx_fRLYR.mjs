@@ -3,13 +3,13 @@ import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { i as useQueryClient, r as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth, t as AuthProvider } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth, t as AuthProvider } from "./useAuth-BSBqbnp_.mjs";
 import { C as redirect, a as useRouterState, c as Outlet, d as createRootRoute, f as Link, h as useRouter, l as lazyRouteComponent, m as useNavigate, n as Scripts, r as HeadContent, s as createRouter, u as createFileRoute } from "../_libs/@tanstack/react-router+[...].mjs";
 import { t as Toaster } from "../_libs/sonner.mjs";
-import { t as Route$6 } from "./materias-Cnq3GOfA.mjs";
-import { t as Route$7 } from "./produccion-ysRuKh3J.mjs";
-import { t as Route$8 } from "./tesis-B4Yt2-J9.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-DM3BELJC.js
+import { t as Route$6 } from "./materias-CScC8ORw.mjs";
+import { t as Route$7 } from "./produccion-Dxb2iL11.mjs";
+import { t as Route$8 } from "./tesis-B9INWwjC.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-Cx_fRLYR.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Toaster$1 = ({ ...props }) => {
@@ -199,9 +199,9 @@ function RootComponent() {
 		] }) })
 	});
 }
-var $$splitComponentImporter$3 = () => import("./pending-approval-xS-GsZuv.mjs");
+var $$splitComponentImporter$3 = () => import("./pending-approval-BxGN7mDi.mjs");
 var Route$4 = createFileRoute("/pending-approval")({ component: lazyRouteComponent($$splitComponentImporter$3, "component") });
-var $$splitComponentImporter$2 = () => import("./dashboard-KxuUBI5c.mjs");
+var $$splitComponentImporter$2 = () => import("./dashboard-DYNy2hUH.mjs");
 var Route$3 = createFileRoute("/dashboard")({
 	head: () => ({ meta: [{ title: "Dashboard — AcadémicoPro" }, {
 		name: "description",
@@ -209,7 +209,7 @@ var Route$3 = createFileRoute("/dashboard")({
 	}] }),
 	component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-var $$splitComponentImporter$1 = () => import("./auth-U_ll8LKh.mjs");
+var $$splitComponentImporter$1 = () => import("./auth-BG8DQ616.mjs");
 var Route$2 = createFileRoute("/auth")({
 	head: () => ({ meta: [{ title: "Iniciar sesión — AcadémicoPro" }, {
 		name: "description",
@@ -217,7 +217,7 @@ var Route$2 = createFileRoute("/auth")({
 	}] }),
 	component: lazyRouteComponent($$splitComponentImporter$1, "component")
 });
-var $$splitComponentImporter = () => import("./admin-DjESaklL.mjs");
+var $$splitComponentImporter = () => import("./admin-CZCuu276.mjs");
 var Route$1 = createFileRoute("/admin")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
 var Route = createFileRoute("/")({ beforeLoad: () => {
 	throw redirect({ to: "/dashboard" });

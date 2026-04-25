@@ -3,11 +3,14 @@ import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { n as useQuery } from "../_libs/tanstack__react-query.mjs";
 import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/useAuth-BL_SAut3.js
+//#region node_modules/.nitro/vite/services/ssr/assets/useAuth-BSBqbnp_.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function createSupabaseClient() {
-	return createClient("https://wdseqguetcgibafibzax.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indkc2VxZ3VldGNnaWJhZmliemF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDkxNTIsImV4cCI6MjA5MjE4NTE1Mn0.Ll2nA3JJlJn57AfCGM1jdUuCDOI1v8Zh5c9eNCc_UW0", { auth: {
+	const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+	const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+	if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) throw new Error("Supabase: define SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en el proyecto (Vercel → Settings → Environment Variables) para el runtime del servidor.");
+	return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth: {
 		storage: typeof window !== "undefined" ? localStorage : void 0,
 		persistSession: true,
 		autoRefreshToken: true

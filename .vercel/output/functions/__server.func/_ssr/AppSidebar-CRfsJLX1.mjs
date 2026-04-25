@@ -1,9 +1,9 @@
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as Button } from "./button-DVyqAt4Q.mjs";
 import { f as Link, i as useLocation } from "../_libs/@tanstack/react-router+[...].mjs";
 import { E as LayoutDashboard, O as GraduationCap, U as BookOpen, h as Shield, j as FileText, t as Zap, x as LogOut, y as Microscope } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/AppSidebar-C1uvycgQ.js
+//#region node_modules/.nitro/vite/services/ssr/assets/AppSidebar-CRfsJLX1.js
 var import_jsx_runtime = require_jsx_runtime();
 var NAV = [
 	{

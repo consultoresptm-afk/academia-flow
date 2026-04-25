@@ -2,18 +2,18 @@ import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as Button } from "./button-DVyqAt4Q.mjs";
 import { t as Input } from "./input-DW4PzhPm.mjs";
 import { m as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
 import { A as Flag, C as LoaderCircle, D as GripVertical, F as CircleCheck, H as Calendar, M as Download, N as Clock, P as Circle, R as ChevronRight, T as LayoutGrid, U as BookOpen, _ as Plus, a as User, d as Trash2, f as Target, j as FileText, k as FolderOpen, u as TrendingUp, v as Pencil, y as Microscope } from "../_libs/lucide-react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { i as TabsTrigger, n as TabsContent, r as TabsList, t as Tabs } from "./tabs-Bcy6-nCM.mjs";
-import { t as AppShell } from "./AppShell-CBLsldfO.mjs";
+import { t as AppShell } from "./AppShell-BNZVYEEj.mjs";
 import { a as DialogHeader, i as DialogFooter, n as Dialog, o as DialogTitle, r as DialogContent, s as Textarea, t as Badge } from "./textarea-CLyuidcl.mjs";
 import { t as Progress } from "./progress-CZD-ZMJu.mjs";
-import { t as Route } from "./tesis-B4Yt2-J9.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/tesis-0mcfl6i4.js
+import { t as Route } from "./tesis-B9INWwjC.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/tesis-C9buVdnF.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var ESTADO_CONFIG = {

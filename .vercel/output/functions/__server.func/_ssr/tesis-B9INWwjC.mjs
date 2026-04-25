@@ -1,6 +1,6 @@
 import { l as lazyRouteComponent, u as createFileRoute } from "../_libs/@tanstack/react-router+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/tesis-B4Yt2-J9.js
-var $$splitComponentImporter = () => import("./tesis-0mcfl6i4.mjs");
+//#region node_modules/.nitro/vite/services/ssr/assets/tesis-B9INWwjC.js
+var $$splitComponentImporter = () => import("./tesis-C9buVdnF.mjs");
 var Route = createFileRoute("/tesis")({
 	validateSearch: (search) => {
 		return { tab: search.tab || "capitulos" };

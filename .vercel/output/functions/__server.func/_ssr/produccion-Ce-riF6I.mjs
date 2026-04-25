@@ -2,7 +2,7 @@ import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
 import { i as useQueryClient, n as useQuery, t as useMutation } from "../_libs/tanstack__react-query.mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
 import { n as cn, t as Button } from "./button-DVyqAt4Q.mjs";
 import { t as Input } from "./input-DW4PzhPm.mjs";
@@ -15,13 +15,13 @@ import { t as requireSupabaseAuth } from "./auth-middleware-DgB-NHqG.mjs";
 import { t as Label } from "./label-DltKm6Et.mjs";
 import { a as Portal, i as Overlay, n as Content, o as Root, r as Description, s as Title, t as Close } from "../_libs/@radix-ui/react-dialog+[...].mjs";
 import { i as TabsTrigger, n as TabsContent, r as TabsList, t as Tabs } from "./tabs-Bcy6-nCM.mjs";
-import { t as AppShell } from "./AppShell-CBLsldfO.mjs";
+import { t as AppShell } from "./AppShell-BNZVYEEj.mjs";
 import { n as CardContent, t as Card } from "./card-qCpth4Ah.mjs";
 import { a as DialogHeader, i as DialogFooter, n as Dialog, o as DialogTitle, r as DialogContent, s as Textarea, t as Badge } from "./textarea-CLyuidcl.mjs";
 import { a as SelectValue, i as SelectTrigger, n as SelectContent, r as SelectItem, t as Select } from "./select-K1gXOkVT.mjs";
-import { t as Route } from "./produccion-ysRuKh3J.mjs";
+import { t as Route } from "./produccion-Dxb2iL11.mjs";
 import { a as HeadingLevel, c as PageOrientation, i as Header2, l as Paragraph, n as File$1, o as Packer, r as Footer2, s as PageNumber, t as AlignmentType, u as TextRun } from "../_libs/docx.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/produccion-DHygFH2Q.js
+//#region node_modules/.nitro/vite/services/ssr/assets/produccion-Ce-riF6I.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Table = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {

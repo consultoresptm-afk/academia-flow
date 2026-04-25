@@ -1,7 +1,7 @@
 import { i as __toESM } from "../_runtime.mjs";
 import { i as require_react } from "../_libs/dnd-kit__accessibility+react.mjs";
 import { o as require_jsx_runtime } from "../_libs/@radix-ui/react-arrow+[...].mjs";
-import { n as supabase, r as useAuth } from "./useAuth-BL_SAut3.mjs";
+import { n as supabase, r as useAuth } from "./useAuth-BSBqbnp_.mjs";
 import { t as Button } from "./button-DVyqAt4Q.mjs";
 import { t as Input } from "./input-DW4PzhPm.mjs";
 import { m as useNavigate } from "../_libs/@tanstack/react-router+[...].mjs";
@@ -10,7 +10,7 @@ import { n as toast } from "../_libs/sonner.mjs";
 import { t as Label } from "./label-DltKm6Et.mjs";
 import { i as TabsTrigger, n as TabsContent, r as TabsList, t as Tabs } from "./tabs-Bcy6-nCM.mjs";
 import { t as createLovableAuth } from "../_libs/lovable.dev__cloud-auth-js.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/auth-U_ll8LKh.js
+//#region node_modules/.nitro/vite/services/ssr/assets/auth-BG8DQ616.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var lovableAuth = createLovableAuth();
