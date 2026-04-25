@@ -3,23 +3,41 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  // Client: Vite inlines VITE_* at build time. SSR on Vercel: read process.env at
+  // runtime (dashboard vars) so missing build-time VITE_ does not break the server.
+  const isSsr = import.meta.env.SSR;
+  const SUPABASE_URL = isSsr
+    ? process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
+    : (import.meta.env.VITE_SUPABASE_URL as string | undefined);
+  const SUPABASE_PUBLISHABLE_KEY = isSsr
+    ? process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+    : (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined);
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     throw new Error(
-      'Missing Supabase environment variables. Ensure SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY (or VITE_ prefixed versions) are set in your .env file.'
+      isSsr
+        ? "Supabase: define SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en el proyecto (Vercel → Settings → Environment Variables) para el runtime del servidor."
+        : "Supabase: define VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY (variables de build para el cliente).",
     );
+  }
+
+  // En Node/SSR (p. ej. Vercel), persistSession + storage undefined puede romper el SDK; en el navegador va con localStorage.
+  if (isSsr) {
+    return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        storage: undefined,
+      },
+    });
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
-      storage: typeof window !== 'undefined' ? localStorage : undefined,
+      storage: typeof window !== "undefined" ? localStorage : undefined,
       persistSession: true,
       autoRefreshToken: true,
-    }
+    },
   });
 }
 

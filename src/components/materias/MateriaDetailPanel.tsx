@@ -6,7 +6,18 @@ import { RepositorioTab } from "./RepositorioTab";
 import { TareasTab } from "./TareasTab";
 import { Materia } from "@/types/materias";
 
-
+function materiaEstadoLabel(estado: string) {
+  switch (estado) {
+    case "activo":
+      return "Activo";
+    case "inactivo":
+      return "Inactivo";
+    case "archivado":
+      return "Archivado";
+    default:
+      return estado;
+  }
+}
 
 export function MateriaDetailPanel({ materia }: { materia: Materia }) {
   return (
@@ -17,7 +28,9 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="font-serif text-2xl font-semibold truncate">{materia.nombre}</h2>
-              <Badge variant={materia.estado === "activo" ? "default" : "secondary"}>{materia.estado}</Badge>
+              <Badge variant={materia.estado === "activo" ? "default" : "secondary"}>
+                {materiaEstadoLabel(materia.estado)}
+              </Badge>
             </div>
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               {materia.codigo && (

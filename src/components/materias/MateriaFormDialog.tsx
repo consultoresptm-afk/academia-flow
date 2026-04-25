@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { Materia } from "@/types/materias";
+import { Materia, MateriaEstado } from "@/types/materias";
 
 const COLORS = ["#16a34a", "#0891b2", "#7c3aed", "#dc2626", "#d97706", "#0284c7", "#db2777", "#ea580c"];
 
@@ -29,7 +29,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
   const [form, setForm] = useState({
     nombre: "", codigo: "", docente: "", creditos: 3,
     semestre: "", color: COLORS[0], descripcion: "",
-    estado: "activo",
+    estado: "activo" as MateriaEstado,
   });
 
   const isEditing = !!materia;
@@ -46,7 +46,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
           semestre: materia.semestre || "",
           color: materia.color || COLORS[0],
           descripcion: materia.descripcion || "",
-          estado: materia.estado || "activo",
+          estado: (materia.estado as MateriaEstado) || "activo",
         });
       } else {
         setForm({
@@ -87,12 +87,13 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
     },
     onError: (e: any) => {
       console.error("Error al guardar materia:", e);
+      // El formulario NO se cierra porque onOpenChange(false) no se llama aquí
       if (e.message?.includes("materias_estado_check")) {
-        toast.error("El estado seleccionado no es válido.");
+        toast.error(`Estado no permitido: El sistema solo acepta 'activo', 'inactivo' o 'archivado'. (Error: ${e.message})`);
       } else if (e.code === "23514") {
-        toast.error("Error de validación: Comprueba que todos los campos cumplan con las reglas.");
+        toast.error(`Error de validación (Check constraint): ${e.message}`);
       } else {
-        toast.error("No se pudo guardar la materia. Inténtalo de nuevo.");
+        toast.error(`Error al guardar: ${e.message || "Inténtalo de nuevo."}`);
       }
     },
   });
@@ -138,7 +139,10 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
           </div>
           <div>
             <Label htmlFor="mat-estado">Estado</Label>
-            <Select value={form.estado} onValueChange={(v) => setForm({ ...form, estado: v })}>
+            <Select
+              value={form.estado}
+              onValueChange={(v) => setForm({ ...form, estado: v as MateriaEstado })}
+            >
               <SelectTrigger id="mat-estado">
                 <SelectValue placeholder="Selecciona un estado" />
               </SelectTrigger>
