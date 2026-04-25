@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { Materia } from "@/types/materias";
 
 const COLORS = ["#16a34a", "#0891b2", "#7c3aed", "#dc2626", "#d97706", "#0284c7", "#db2777", "#ea580c"];
 
@@ -20,7 +21,7 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   userId: string;
-  materia?: any;
+  materia?: Materia | null;
 };
 
 export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props) {
@@ -28,48 +29,34 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
   const [form, setForm] = useState({
     nombre: "", codigo: "", docente: "", creditos: 3,
     semestre: "", color: COLORS[0], descripcion: "",
-    estado: "Materia Activa",
+    estado: "activo",
   });
 
   const isEditing = !!materia;
 
   // Reset form when opening or changing materia
-  useState(() => {
-    if (materia) {
-      setForm({
-        nombre: materia.nombre || "",
-        codigo: materia.codigo || "",
-        docente: materia.docente || "",
-        creditos: materia.creditos || 3,
-        semestre: materia.semestre || "",
-        color: materia.color || COLORS[0],
-        descripcion: materia.descripcion || "",
-        estado: materia.estado || "Materia Activa",
-      });
+  useEffect(() => {
+    if (open) {
+      if (materia) {
+        setForm({
+          nombre: materia.nombre || "",
+          codigo: materia.codigo || "",
+          docente: materia.docente || "",
+          creditos: materia.creditos || 3,
+          semestre: materia.semestre || "",
+          color: materia.color || COLORS[0],
+          descripcion: materia.descripcion || "",
+          estado: materia.estado || "activo",
+        });
+      } else {
+        setForm({
+          nombre: "", codigo: "", docente: "", creditos: 3,
+          semestre: "", color: COLORS[0], descripcion: "",
+          estado: "activo",
+        });
+      }
     }
-  });
-
-  // Since useState with a function only runs on mount, we need an effect or handle it on open
-  useState(() => {
-    if (open && materia) {
-       setForm({
-        nombre: materia.nombre || "",
-        codigo: materia.codigo || "",
-        docente: materia.docente || "",
-        creditos: materia.creditos || 3,
-        semestre: materia.semestre || "",
-        color: materia.color || COLORS[0],
-        descripcion: materia.descripcion || "",
-        estado: materia.estado || "Materia Activa",
-      });
-    } else if (open && !materia) {
-      setForm({
-        nombre: "", codigo: "", docente: "", creditos: 3,
-        semestre: "", color: COLORS[0], descripcion: "",
-        estado: "Materia Activa",
-      });
-    }
-  });
+  }, [open, materia]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -98,7 +85,16 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
       qc.invalidateQueries({ queryKey: ["materias"] });
       onOpenChange(false);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: any) => {
+      console.error("Error al guardar materia:", e);
+      if (e.message?.includes("materias_estado_check")) {
+        toast.error("El estado seleccionado no es válido.");
+      } else if (e.code === "23514") {
+        toast.error("Error de validación: Comprueba que todos los campos cumplan con las reglas.");
+      } else {
+        toast.error("No se pudo guardar la materia. Inténtalo de nuevo.");
+      }
+    },
   });
 
   return (
@@ -147,9 +143,9 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
                 <SelectValue placeholder="Selecciona un estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Materia Activa">Materia Activa</SelectItem>
-                <SelectItem value="Materia Consolidada">Materia Consolidada</SelectItem>
-                <SelectItem value="Materia En Progreso">Materia En Progreso</SelectItem>
+                <SelectItem value="activo">Activo</SelectItem>
+                <SelectItem value="inactivo">Inactivo</SelectItem>
+                <SelectItem value="archivado">Archivado</SelectItem>
               </SelectContent>
             </Select>
           </div>

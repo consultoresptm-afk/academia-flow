@@ -6,11 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, User, BookOpen, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Materia } from "@/types/materias";
 
-type Materia = {
-  id: string; nombre: string; codigo: string | null; docente: string | null;
-  color: string | null; estado: string; creditos: number | null;
-};
+
 
 type Props = {
   materias: Materia[];
