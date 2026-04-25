@@ -3,14 +3,22 @@
 //   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only, disabled here for Vercel),
 //     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
-// Vercel: Cloudflare worker output is incompatible; use Nitro (TanStack + Vercel official path).
+// Lovable "Publicar" builds for Cloudflare Workers (needs the default @cloudflare/vite-plugin on build).
+// Vercel sets VERCEL=1 during build: use Nitro there only (not compatible with the CF worker output).
+// Local Vercel-like build: `set VERCEL=1` (Win) or `VERCEL=1` (Unix) then `bun run build`.
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { nitro } from "nitro/vite";
 
+const deployVercel =
+  process.env.VERCEL === "1" ||
+  process.env.VERCEL === "true" ||
+  process.env.DEPLOY_TARGET === "vercel";
+
 export default defineConfig({
-  cloudflare: false,
-  plugins: [nitro()],
+  ...(deployVercel
+    ? { cloudflare: false as const, plugins: [nitro()] as const }
+    : {}),
   vite: {
     server: {
       hmr: {
