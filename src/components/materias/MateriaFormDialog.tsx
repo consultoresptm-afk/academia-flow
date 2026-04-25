@@ -73,7 +73,7 @@ export function MateriaFormDialog({ open, onOpenChange, userId, materia }: Props
       };
 
       if (isEditing) {
-        const { error } = await supabase.from("materias").update(payload).eq("id", materia.id);
+        const { error } = await supabase.from("materias").update(payload).eq("id", materia!.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("materias").insert(payload);

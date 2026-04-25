@@ -9,6 +9,7 @@ import { MateriaSidebar } from "@/components/materias/MateriaSidebar";
 import { MateriaDetailPanel } from "@/components/materias/MateriaDetailPanel";
 import { MateriaFormDialog } from "@/components/materias/MateriaFormDialog";
 import { AppSidebar } from "@/components/AppSidebar";
+import { Materia } from "@/types/materias";
 
 type MateriasSearch = {
   selected?: string;
@@ -36,14 +37,14 @@ function MateriasPage() {
   const selectedId = searchParams.selected || null;
   const setSelectedId = (id: string | null) => navigate({ to: "/materias", search: (p: { selected?: string }) => ({ ...p, selected: id || undefined }) });
   const [formOpen, setFormOpen] = useState(false);
-  const [editingMateria, setEditingMateria] = useState<any | null>(null);
+  const [editingMateria, setEditingMateria] = useState<Materia | null>(null);
 
   const handleCreate = () => {
     setEditingMateria(null);
     setFormOpen(true);
   };
 
-  const handleEdit = (materia: any) => {
+  const handleEdit = (materia: Materia) => {
     setEditingMateria(materia);
     setFormOpen(true);
   };
@@ -59,7 +60,7 @@ function MateriasPage() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data as Materia[]) ?? [];
     },
     // Seleccionar la primera materia automáticamente cuando cargue la lista
     select: (data) => {

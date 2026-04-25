@@ -47,7 +47,7 @@ function DashboardPage() {
 
   const stats = useMemo(() => {
     const total = materias?.length ?? 0;
-    const activas = materias?.filter((m) => m.estado === "activa").length ?? 0;
+    const activas = materias?.filter((m) => m.estado === "activo").length ?? 0;
     const pendientes = trabajos?.filter((t) => t.estado !== "entrega").length ?? 0;
 
     // Promedio ponderado real desde notas
