@@ -1,12 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Trophy, Clock, AlertTriangle, CheckCircle } from "lucide-react";
+import { BookOpen, Trophy, Clock, AlertTriangle, CheckCircle, RefreshCw } from "lucide-react";
 import { AvanceGaugeChart } from "@/components/ActivityChart";
 import { PromedioChart } from "@/components/PomodoroTimer";
 
@@ -23,6 +23,15 @@ export const Route = createFileRoute("/dashboard")({
 function DashboardPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    await queryClient.invalidateQueries({ queryKey: ["materias", user?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["trabajos-dashboard", user?.id] });
+    setTimeout(() => setIsSyncing(false), 600); // Efecto visual
+  };
 
 
   const { data: materias } = useQuery({
@@ -94,9 +103,19 @@ function DashboardPage() {
 
   return (
     <AppShell>
-      <header className="mb-8">
-        <p className="text-sm text-muted-foreground">Hola de nuevo,</p>
-        <h1 className="font-serif text-3xl md:text-4xl mt-1">Tu panel académico</h1>
+      <header className="mb-8 flex items-end justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Hola de nuevo,</p>
+          <h1 className="font-serif text-3xl md:text-4xl mt-1">Tu panel académico</h1>
+        </div>
+        <button 
+          onClick={handleSync}
+          disabled={isSyncing}
+          className="flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`size-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+          {isSyncing ? "Sincronizando..." : "Sincronizar"}
+        </button>
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

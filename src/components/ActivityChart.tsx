@@ -152,7 +152,7 @@ export function AvanceGaugeChart() {
 
   const { data: materias = [] } = useQuery({
     enabled: !!user,
-    queryKey: ["materias-avance", user?.id],
+    queryKey: ["materias", user?.id],
     queryFn: async () => {
       const { data } = await supabase.from("materias").select("id, creditos, estado");
       return data ?? [];
@@ -161,7 +161,7 @@ export function AvanceGaugeChart() {
 
   const { data: trabajos = [] } = useQuery({
     enabled: !!user,
-    queryKey: ["trabajos-avance", user?.id],
+    queryKey: ["trabajos-dashboard", user?.id],
     queryFn: async () => {
       const { data } = await supabase.from("trabajos").select("estado, peso, materia_id");
       return data ?? [];
