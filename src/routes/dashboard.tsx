@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Trophy, Clock, AlertTriangle } from "lucide-react";
+import { BookOpen, Trophy, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { AvanceGaugeChart } from "@/components/ActivityChart";
 import { PromedioChart } from "@/components/PomodoroTimer";
 
@@ -46,8 +46,10 @@ function DashboardPage() {
   });
 
   const stats = useMemo(() => {
-    const total = materias?.length ?? 0;
+    const totalMaterias = 19; // Según referencia técnica
     const activas = materias?.filter((m) => m.estado === "activo").length ?? 0;
+    
+    const entregados = trabajos?.filter((t) => t.estado === "entrega").length ?? 0;
     const pendientes = trabajos?.filter((t) => t.estado !== "entrega").length ?? 0;
 
     // Promedio ponderado real desde notas
@@ -68,7 +70,14 @@ function DashboardPage() {
       return f >= hoy && f <= en7;
     }).length ?? 0;
 
-    return { total, activas, promedio, pendientes, alertas };
+    return { 
+      totalMaterias, 
+      activas, 
+      promedio, 
+      pendientes, 
+      entregados,
+      alertas 
+    };
   }, [materias, trabajos]);
 
   const proximasEntregas = useMemo(() => {
@@ -92,8 +101,18 @@ function DashboardPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <KPI label="Promedio" value={stats.promedio.toFixed(2)} icon={Trophy} tone="success" />
-        <KPI label="Materias activas" value={String(stats.activas)} icon={BookOpen} />
-        <KPI label="Trabajos pendientes" value={String(stats.pendientes)} icon={Clock} />
+        <KPI 
+          label="Materias activas" 
+          value={`${stats.activas} / ${stats.totalMaterias}`} 
+          icon={BookOpen} 
+          progress={(stats.activas / stats.totalMaterias) * 100}
+        />
+        <KPI 
+          label="Trabajos pendientes" 
+          value={`${stats.pendientes} / ${stats.entregados}`} 
+          icon={stats.pendientes === 0 ? CheckCircle : Clock} 
+          tone={stats.pendientes === 0 ? "success" : undefined}
+        />
         <KPI label="Alertas (7 días)" value={String(stats.alertas)} icon={AlertTriangle} tone="warning" />
       </div>
 
@@ -146,7 +165,19 @@ function DashboardPage() {
   );
 }
 
-function KPI({ label, value, icon: Icon, tone }: { label: string; value: string; icon: typeof BookOpen; tone?: "success" | "warning" }) {
+function KPI({ 
+  label, 
+  value, 
+  icon: Icon, 
+  tone,
+  progress 
+}: { 
+  label: string; 
+  value: string; 
+  icon: typeof BookOpen; 
+  tone?: "success" | "warning";
+  progress?: number;
+}) {
   const toneClass =
     tone === "success" ? "bg-success/10 text-success" :
     tone === "warning" ? "bg-warning/15 text-warning-foreground" :
@@ -155,11 +186,27 @@ function KPI({ label, value, icon: Icon, tone }: { label: string; value: string;
     <Card className="border-border/60">
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
-          <div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">{label}</div>
-            <div className="font-serif text-3xl mt-2">{value}</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs text-muted-foreground uppercase tracking-wide truncate">{label}</div>
+            <div className="font-serif text-2xl mt-2 flex items-baseline gap-2">
+              {value}
+              {progress !== undefined && (
+                <span className="text-xs font-sans text-muted-foreground font-normal">
+                  ({progress.toFixed(1)}%)
+                </span>
+              )}
+            </div>
+            
+            {progress !== undefined && (
+              <div className="mt-3 h-1 w-full bg-primary/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-500" 
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            )}
           </div>
-          <div className={`size-10 rounded-lg flex items-center justify-center ${toneClass}`}>
+          <div className={`size-10 rounded-lg flex items-center justify-center shrink-0 ml-3 ${toneClass}`}>
             <Icon className="size-5" />
           </div>
         </div>

@@ -150,29 +150,58 @@ function GaugeSVG({ value }: { value: number }) {
 export function AvanceGaugeChart() {
   const { user } = useAuth();
 
-  const { data: trabajos = [] } = useQuery({
+  const { data: materias = [] } = useQuery({
     enabled: !!user,
-    queryKey: ["trabajos-avance", user?.id],
+    queryKey: ["materias-avance", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("trabajos").select("estado, peso");
+      const { data } = await supabase.from("materias").select("id, creditos, estado");
       return data ?? [];
     },
   });
 
-  // Calcular % de avance: entregados / total (ponderado por peso si existe)
+  const { data: trabajos = [] } = useQuery({
+    enabled: !!user,
+    queryKey: ["trabajos-avance", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("trabajos").select("estado, peso, materia_id");
+      return data ?? [];
+    },
+  });
+
+  // Calcular % de avance basado en créditos (Meta: 38 créditos)
+  const TOTAL_CREDITOS_PROGRAMA = 38;
+
   const avance = (() => {
-    if (!trabajos.length) return 0;
-    const total = trabajos.reduce((s, t) => s + (t.peso ?? 1), 0);
-    const completados = trabajos
-      .filter((t) => t.estado === "entrega")
-      .reduce((s, t) => s + (t.peso ?? 1), 0);
-    return total > 0 ? (completados / total) * 100 : 0;
+    if (!materias.length && !trabajos.length) return 0;
+    
+    let creditosGanados = 0;
+
+    materias.forEach(m => {
+      const trabajosMateria = trabajos.filter(t => t.materia_id === m.id);
+      const creditosMateria = m.creditos || 2; // Default 2 si no está definido (19 * 2 = 38)
+      
+      if (trabajosMateria.length > 0) {
+        const totalPeso = trabajosMateria.reduce((s, t) => s + (t.peso || 1), 0);
+        const completadoPeso = trabajosMateria
+          .filter(t => t.estado === "entrega")
+          .reduce((s, t) => s + (t.peso || 1), 0);
+        
+        const porcentajeMateria = totalPeso > 0 ? (completadoPeso / totalPeso) : 0;
+        creditosGanados += creditosMateria * porcentajeMateria;
+      } else if (m.estado === "archivado") {
+        // Si no hay trabajos pero está archivada, asumimos completada (ej. semestre anterior)
+        creditosGanados += creditosMateria;
+      }
+    });
+
+    return (creditosGanados / TOTAL_CREDITOS_PROGRAMA) * 100;
   })();
 
   const stats = {
     total: trabajos.length,
     entregados: trabajos.filter((t) => t.estado === "entrega").length,
     pendientes: trabajos.filter((t) => t.estado !== "entrega").length,
+    creditos: avance * (TOTAL_CREDITOS_PROGRAMA / 100)
   };
 
   return (
@@ -182,7 +211,7 @@ export function AvanceGaugeChart() {
       {/* Leyenda inferior */}
       <div className="flex items-center gap-4 mt-2">
         {[
-          { label: "TOTAL", value: stats.total, color: "#d4a574" },
+          { label: "CRÉDITOS", value: stats.creditos.toFixed(1), color: "#d4a574" },
           { label: "ENTREGADOS", value: stats.entregados, color: "#22c55e" },
           { label: "PENDIENTES", value: stats.pendientes, color: "#f97316" },
         ].map(({ label, value, color }) => (
