@@ -1,9 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, User, Calendar, Star, CheckCircle2, FileText } from "lucide-react";
+import { BookOpen, User, Calendar, Star, CheckCircle2, FileText, Info, Video } from "lucide-react";
 import { NotasTab } from "./NotasTab";
 import { RepositorioTab } from "./RepositorioTab";
 import { TareasTab } from "./TareasTab";
+import { InformacionTab } from "./InformacionTab";
+import { EncuentrosTab } from "./EncuentrosTab";
 import { Materia } from "@/types/materias";
 
 function materiaEstadoLabel(estado: string) {
@@ -60,25 +62,38 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4">
-        <Tabs defaultValue="notas">
-          <TabsList className="w-full">
-            <TabsTrigger value="notas" className="flex-1">
+        <Tabs defaultValue="informacion">
+          <TabsList className="w-full flex-wrap h-auto gap-1 bg-transparent p-0">
+            <TabsTrigger value="informacion" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
+              <Info className="size-4 mr-2" />Información
+            </TabsTrigger>
+            <TabsTrigger value="notas" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <Star className="size-4 mr-2" />Notas
             </TabsTrigger>
-            <TabsTrigger value="tareas" className="flex-1">
+            <TabsTrigger value="tareas" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <CheckCircle2 className="size-4 mr-2" />Tareas
             </TabsTrigger>
-            <TabsTrigger value="repositorio" className="flex-1">
+            <TabsTrigger value="encuentros" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
+              <Video className="size-4 mr-2" />Encuentros
+            </TabsTrigger>
+            <TabsTrigger value="repositorio" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <FileText className="size-4 mr-2" />Repositorio
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="notas" className="mt-4">
+          
+          <TabsContent value="informacion" className="mt-6">
+            <InformacionTab materia={materia} />
+          </TabsContent>
+          <TabsContent value="notas" className="mt-6">
             <NotasTab materiaId={materia.id} />
           </TabsContent>
-          <TabsContent value="tareas" className="mt-4">
+          <TabsContent value="tareas" className="mt-6">
             <TareasTab materiaId={materia.id} />
           </TabsContent>
-          <TabsContent value="repositorio" className="mt-4">
+          <TabsContent value="encuentros" className="mt-6">
+            <EncuentrosTab materiaId={materia.id} />
+          </TabsContent>
+          <TabsContent value="repositorio" className="mt-6">
             <RepositorioTab materiaId={materia.id} />
           </TabsContent>
         </Tabs>

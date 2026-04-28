@@ -96,6 +96,11 @@ function MateriasPage() {
   const progresos = useMemo(() => {
     const map: Record<string, number> = {};
     materias.forEach((m) => {
+      // Si la materia está archivada, el progreso es siempre 100%
+      if (m.estado === "archivado") {
+        map[m.id] = 100;
+        return;
+      }
       const notas = trabajosConNota.filter((t) => t.materia_id === m.id);
       if (!notas.length) { map[m.id] = 0; return; }
       const totalPeso = notas.reduce((s, t) => s + (t.peso ?? 0), 0);

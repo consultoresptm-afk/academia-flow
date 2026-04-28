@@ -180,7 +180,10 @@ export function AvanceGaugeChart() {
       const trabajosMateria = trabajos.filter(t => t.materia_id === m.id);
       const creditosMateria = m.creditos || 2; // Default 2 si no está definido (19 * 2 = 38)
       
-      if (trabajosMateria.length > 0) {
+      if (m.estado === "archivado") {
+        // Si la materia está archivada, ya se completó.
+        creditosGanados += creditosMateria;
+      } else if (trabajosMateria.length > 0) {
         const totalPeso = trabajosMateria.reduce((s, t) => s + (t.peso || 1), 0);
         const completadoPeso = trabajosMateria
           .filter(t => t.estado === "entrega")
@@ -188,9 +191,6 @@ export function AvanceGaugeChart() {
         
         const porcentajeMateria = totalPeso > 0 ? (completadoPeso / totalPeso) : 0;
         creditosGanados += creditosMateria * porcentajeMateria;
-      } else if (m.estado === "archivado") {
-        // Si no hay trabajos pero está archivada, asumimos completada (ej. semestre anterior)
-        creditosGanados += creditosMateria;
       }
     });
 
