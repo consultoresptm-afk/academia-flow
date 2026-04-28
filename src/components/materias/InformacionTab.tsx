@@ -129,7 +129,7 @@ export function InformacionTab({ materia }: { materia: Materia }) {
               <Trophy className="size-5" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-primary/80 font-bold">Promedio Actual</p>
+              <p className="text-[10px] uppercase tracking-widest text-primary font-bold">Promedio Actual</p>
               <p className="text-xl font-serif font-bold mt-0.5 text-primary">
                 {statsGrades.count > 0 ? statsGrades.promedio.toFixed(2) : "—"}
               </p>
@@ -139,7 +139,7 @@ export function InformacionTab({ materia }: { materia: Materia }) {
       </div>
 
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={handleOpenEdit} className="gap-2 border-primary/20 hover:bg-primary/5">
+        <Button variant="outline" size="sm" onClick={handleOpenEdit} className="gap-2 border-primary/30 text-foreground font-medium">
           <Pencil className="size-3.5" /> Editar Información
         </Button>
       </div>
@@ -245,8 +245,8 @@ function InfoCard({ icon: Icon, label, value }: { icon: any, label: string, valu
           <Icon className="size-5" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/80">{label}</p>
-          <p className="text-sm font-medium mt-0.5">{value}</p>
+          <p className="text-[10px] uppercase tracking-widest text-foreground font-bold">{label}</p>
+          <p className="text-sm font-semibold mt-0.5 text-foreground">{value}</p>
         </div>
       </CardContent>
     </Card>

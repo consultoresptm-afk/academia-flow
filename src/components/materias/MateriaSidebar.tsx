@@ -70,8 +70,8 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                 className={cn(
                   "group relative px-4 py-3 cursor-pointer transition-colors border-l-[3px]",
                   isSelected
-                    ? "bg-primary/8 border-l-primary"
-                    : "border-l-transparent hover:bg-muted/50"
+                    ? "bg-primary/10 border-l-primary"
+                    : "border-l-transparent"
                 )}
               >
                 {/* Color dot + nombre */}
@@ -98,14 +98,14 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                   </span>
                 </div>
 
-                {/* Botones acciones (siempre visibles) */}
+                {/* Botones acciones (siempre visibles y sin hover) */}
                 <div className="absolute right-2 top-2 flex items-center gap-1 opacity-100 transition-opacity">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(m);
                     }}
-                    className="p-1 rounded hover:bg-muted text-muted-foreground transition-colors"
+                    className="p-1 rounded text-muted-foreground transition-colors"
                     aria-label="Editar materia"
                   >
                     <Pencil className="size-3" />
@@ -115,7 +115,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                       e.stopPropagation();
                       if (confirm(`¿Eliminar "${m.nombre}"?`)) removeMutation.mutate(m.id);
                     }}
-                    className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors"
+                    className="p-1 rounded text-destructive transition-colors"
                     aria-label="Eliminar materia"
                   >
                     <Trash2 className="size-3" />

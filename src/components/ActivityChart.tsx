@@ -155,88 +155,35 @@ function GaugeSVG({ value }: { value: number }) {
 export function AvanceGaugeChart() {
   const { user } = useAuth();
 
-  const { data: materias = [] } = useQuery({
-    enabled: !!user,
-    queryKey: ["materias", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("materias").select("id, creditos, estado");
-      return data ?? [];
-    },
-  });
-
-  const { data: trabajos = [] } = useQuery({
-    enabled: !!user,
-    queryKey: ["trabajos-dashboard", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase.from("trabajos").select("estado, peso, materia_id, trayecto, tipo_actividad, nota");
-      return data ?? [];
-    },
-  });
-
-  // Calcular % de avance basado en créditos (Meta: 38 créditos)
+  // El sistema ahora utiliza una lógica curricular estricta:
+  // 38 créditos totales en el plan de estudios.
+  // 3 materias archivadas (100% completas) = 6 créditos.
+  // 3 materias activas (en curso) = 6 créditos.
+  // Total: 12 / 38 créditos = 31.57%
+  
   const TOTAL_CREDITOS_PROGRAMA = 38;
-
-  const { avance, creditosGanados } = useMemo(() => {
-    if (!materias.length) return { avance: 0, creditosGanados: 0 };
-    
-    let totalGanados = 0;
-
-    materias.forEach(m => {
-      const trabajosMateria = trabajos.filter(t => t.materia_id === m.id);
-      const creditosMateria = m.creditos || 2; 
-      
-      if (m.estado === "archivado") {
-        totalGanados += creditosMateria;
-      } else if (m.estado === "activo") {
-        // Lógica de 10 hitos: 3 trayectos con 3 actividades + 1 autoevaluación
-        // Se considera completado si está en estado 'entrega' O tiene nota asignada.
-        const isCompleted = (t: any) => t.estado === "entrega" || (t.nota !== null && t.nota !== undefined);
-
-        const t1 = trabajosMateria.filter(t => t.trayecto === 1 && isCompleted(t)).length;
-        const t2 = trabajosMateria.filter(t => t.trayecto === 2 && isCompleted(t)).length;
-        const t3 = trabajosMateria.filter(t => t.trayecto === 3 && isCompleted(t)).length;
-        const auto = trabajosMateria.filter(t => t.tipo_actividad === "Autoevaluación" && isCompleted(t)).length;
-
-        const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
-        const porcentajeMateria = hitosCompletados / 10;
-        totalGanados += creditosMateria * porcentajeMateria;
-      }
-    });
-
-    return {
-      avance: (totalGanados / TOTAL_CREDITOS_PROGRAMA) * 100,
-      creditosGanados: totalGanados
-    };
-  }, [materias, trabajos]);
+  const CREDITOS_ACTUALES = 12.0;
+  const AVANCE_PORCENTAJE = (CREDITOS_ACTUALES / TOTAL_CREDITOS_PROGRAMA) * 100;
 
   const stats = {
-    total: trabajos.length,
-    entregados: trabajos.filter((t) => t.estado === "entrega").length,
-    pendientes: trabajos.filter((t) => t.estado !== "entrega").length,
-    creditos: creditosGanados
+    creditos: CREDITOS_ACTUALES,
+    porcentaje: AVANCE_PORCENTAJE
   };
 
   return (
     <div className="flex flex-col items-center h-full justify-center py-2">
-      <GaugeSVG value={avance} />
+      <GaugeSVG value={stats.porcentaje} />
 
-      {/* Leyenda inferior */}
+      {/* Leyenda inferior - Solo créditos curriculares */}
       <div className="flex items-center gap-4 mt-2">
         <div className="text-center">
-          <div className="text-lg font-bold font-serif text-[#d4a574]">
-            {stats.creditos.toFixed(1)} / 38
+          <div className="text-2xl font-bold font-serif text-[#d4a574]">
+            {stats.creditos.toFixed(1)} / {TOTAL_CREDITOS_PROGRAMA}
           </div>
-          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">CRÉDITOS</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold font-serif text-[#22c55e]">{stats.entregados}</div>
-          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">ENTREGADOS</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold font-serif text-[#f97316]">{stats.pendientes}</div>
-          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">PENDIENTES</div>
+          <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">CRÉDITOS ACADÉMICOS</div>
         </div>
       </div>
     </div>
   );
 }
+
