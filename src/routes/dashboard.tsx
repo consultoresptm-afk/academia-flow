@@ -56,7 +56,7 @@ function DashboardPage() {
 
   const stats = useMemo(() => {
     const totalMaterias = 19; // Según referencia técnica
-    const activas = materias?.filter((m) => m.estado === "activo").length ?? 0;
+    const cursadas = materias?.filter((m) => m.estado === "activo" || m.estado === "archivado").length ?? 0;
     
     const entregados = trabajos?.filter((t) => t.estado === "entrega").length ?? 0;
     const pendientes = trabajos?.filter((t) => t.estado !== "entrega").length ?? 0;
@@ -81,7 +81,7 @@ function DashboardPage() {
 
     return { 
       totalMaterias, 
-      activas, 
+      cursadas, 
       promedio, 
       pendientes, 
       entregados,
@@ -121,10 +121,11 @@ function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <KPI label="Promedio" value={stats.promedio.toFixed(2)} icon={Trophy} tone="success" />
         <KPI 
-          label="Materias activas" 
-          value={`${stats.activas} / ${stats.totalMaterias}`} 
+          label="Materias en curso" 
+          value={`${stats.cursadas} / ${stats.totalMaterias}`} 
           icon={BookOpen} 
-          progress={(stats.activas / stats.totalMaterias) * 100}
+          tone="warning"
+          progress={(stats.cursadas / stats.totalMaterias) * 100}
         />
         <KPI 
           label="Trabajos pendientes" 
@@ -219,7 +220,11 @@ function KPI({
             {progress !== undefined && (
               <div className="mt-3 h-1 w-full bg-primary/10 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-primary transition-all duration-500" 
+                  className={`h-full transition-all duration-500 ${
+                    tone === "success" ? "bg-success" :
+                    tone === "warning" ? "bg-warning" :
+                    "bg-primary"
+                  }`} 
                   style={{ width: `${progress}%` }}
                 />
               </div>
