@@ -210,7 +210,7 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
             </thead>
             <tbody className="divide-y divide-border">
               {trabajos.map((t) => (
-                <tr key={t.id} className="hover:bg-muted/20 transition-colors">
+                <tr key={t.id} className="transition-colors bg-card/20">
                   <td className="px-4 py-3 font-medium">
                     {t.titulo}
                     {t.documento_url && (

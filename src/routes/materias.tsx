@@ -104,10 +104,13 @@ function MateriasPage() {
       if (!trabajos.length) { map[m.id] = 0; return; }
 
       // Lógica de 10 hitos: 3 trayectos con 3 actividades + 1 autoevaluación
-      const t1 = trabajos.filter(t => t.trayecto === 1 && t.nota !== null).length;
-      const t2 = trabajos.filter(t => t.trayecto === 2 && t.nota !== null).length;
-      const t3 = trabajos.filter(t => t.trayecto === 3 && t.nota !== null).length;
-      const auto = trabajos.filter(t => t.tipo_actividad === "Autoevaluación" && t.nota !== null).length;
+      // Se considera completado si está en estado 'entrega' O tiene nota asignada.
+      const isCompleted = (t: any) => t.estado === "entrega" || (t.nota !== null && t.nota !== undefined);
+
+      const t1 = trabajos.filter(t => t.trayecto === 1 && isCompleted(t)).length;
+      const t2 = trabajos.filter(t => t.trayecto === 2 && isCompleted(t)).length;
+      const t3 = trabajos.filter(t => t.trayecto === 3 && isCompleted(t)).length;
+      const auto = trabajos.filter(t => (t.tipo_actividad === "Autoevaluación" || t.tipo === "autoevaluación") && isCompleted(t)).length;
 
       const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
       map[m.id] = (hitosCompletados / 10) * 100;

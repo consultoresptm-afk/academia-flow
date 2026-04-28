@@ -52,8 +52,8 @@ function GaugeSVG({ value }: { value: number }) {
   const currentColor = pct < 40 ? "#ef4444" : pct < 70 ? "#f97316" : "#22c55e";
   
   let label = "FUNDAMENTACIÓN";
-  if (currentCredits > 26) label = "TRASCENDENCIA";
-  else if (currentCredits > 12) label = "INTEGRACIÓN";
+  if (currentCredits >= 27) label = "TRASCENDENCIA";
+  else if (currentCredits >= 13) label = "INTEGRACIÓN";
 
   return (
     <svg viewBox="0 0 240 180" className="w-full max-w-xs mx-auto select-none">
@@ -189,10 +189,13 @@ export function AvanceGaugeChart() {
         totalGanados += creditosMateria;
       } else if (m.estado === "activo") {
         // Lógica de 10 hitos: 3 trayectos con 3 actividades + 1 autoevaluación
-        const t1 = trabajosMateria.filter(t => t.trayecto === 1 && t.nota !== null).length;
-        const t2 = trabajosMateria.filter(t => t.trayecto === 2 && t.nota !== null).length;
-        const t3 = trabajosMateria.filter(t => t.trayecto === 3 && t.nota !== null).length;
-        const auto = trabajosMateria.filter(t => t.tipo_actividad === "Autoevaluación" && t.nota !== null).length;
+        // Se considera completado si está en estado 'entrega' O tiene nota asignada.
+        const isCompleted = (t: any) => t.estado === "entrega" || (t.nota !== null && t.nota !== undefined);
+
+        const t1 = trabajosMateria.filter(t => t.trayecto === 1 && isCompleted(t)).length;
+        const t2 = trabajosMateria.filter(t => t.trayecto === 2 && isCompleted(t)).length;
+        const t3 = trabajosMateria.filter(t => t.trayecto === 3 && isCompleted(t)).length;
+        const auto = trabajosMateria.filter(t => (t.tipo_actividad === "Autoevaluación" || t.tipo === "autoevaluación") && isCompleted(t)).length;
 
         const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
         const porcentajeMateria = hitosCompletados / 10;

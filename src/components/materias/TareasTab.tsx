@@ -57,7 +57,7 @@ export function TareasTab({ materiaId }: { materiaId: string }) {
           ) : (
             <div className="space-y-1.5 pl-2">
               {grupos[key].map((t) => (
-                <div key={t.id} className="flex items-center gap-3 px-3 py-2 rounded-md border bg-card hover:bg-muted/30 transition-colors">
+                <div key={t.id} className="flex items-center gap-3 px-3 py-2 rounded-md border bg-card/40">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{t.titulo}</p>
                     <div className="flex items-center gap-2 mt-0.5">
