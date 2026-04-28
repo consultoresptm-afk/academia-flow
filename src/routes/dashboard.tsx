@@ -259,7 +259,7 @@ function KPI({
 }
 
 function DashboardEncuentros({ materias }: { materias: any[] }) {
-  const [encuentros, setEncuentros] = useState<any[]>([]);
+  const [encuentrosPorMateria, setEncuentrosPorMateria] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     const saved = localStorage.getItem("academia-flow-encuentros");
@@ -267,49 +267,91 @@ function DashboardEncuentros({ materias }: { materias: any[] }) {
       try {
         const all = JSON.parse(saved);
         const hoy = new Date();
-        const proximos = all
-          .filter((e: any) => e.fecha && new Date(e.fecha) >= hoy)
-          .sort((a: any, b: any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
-          .slice(0, 5);
-        setEncuentros(proximos);
-      } catch (e) {}
+        hoy.setHours(0, 0, 0, 0);
+
+        // Filtrar solo los futuros
+        const proximos = all.filter((e: any) => {
+          if (!e.fecha) return false;
+          // Usar la fecha del encuentro
+          const fechaE = new Date(e.fecha + "T00:00:00");
+          return fechaE >= hoy;
+        });
+
+        // Agrupar por materia
+        const grouped: Record<string, any[]> = {};
+        proximos.forEach((e: any) => {
+          if (!grouped[e.materiaId]) grouped[e.materiaId] = [];
+          grouped[e.materiaId].push(e);
+        });
+
+        // Ordenar cada grupo cronológicamente (ascendente)
+        Object.keys(grouped).forEach(mId => {
+          grouped[mId].sort((a, b) => {
+            const dateA = new Date(a.fecha + "T" + (a.hora?.split("-")[0].trim() || "00:00")).getTime();
+            const dateB = new Date(b.fecha + "T" + (b.hora?.split("-")[0].trim() || "00:00")).getTime();
+            return dateA - dateB;
+          });
+        });
+
+        setEncuentrosPorMateria(grouped);
+      } catch (e) {
+        console.error("Error loading encounters in dashboard", e);
+      }
     }
   }, []);
 
   const getMateriaInfo = (id: string) => materias.find(m => m.id === id);
+  const subjectIds = Object.keys(encuentrosPorMateria);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="font-serif text-xl">Próximos Encuentros</CardTitle>
-        <Video className="size-4 text-primary opacity-70" />
+    <Card className="border-border/60 overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-muted/20">
+        <div className="flex items-center gap-2">
+          <Video className="size-5 text-primary" />
+          <CardTitle className="font-serif text-xl">Próximos Encuentros</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
-        {encuentros.length === 0 ? (
-          <div className="text-sm text-muted-foreground py-8 text-center">
+      <CardContent className="p-0">
+        {subjectIds.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-12 text-center">
             No hay encuentros programados.
           </div>
         ) : (
-          <ul className="divide-y divide-border">
-            {encuentros.map((e) => {
-              const materia = getMateriaInfo(e.materiaId);
+          <div className="divide-y divide-border">
+            {subjectIds.map((mId) => {
+              const materia = getMateriaInfo(mId);
+              const items = encuentrosPorMateria[mId];
+              
               return (
-                <li key={e.id} className="py-3 flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="font-medium truncate text-sm uppercase tracking-tight">{e.tematica}</div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className="size-1.5 rounded-full" style={{ backgroundColor: materia?.color || '#f59e0b' }} />
-                      <span className="text-[10px] text-muted-foreground uppercase">{materia?.nombre || "Materia"}</span>
-                    </div>
+                <div key={mId} className="group">
+                  <div className="bg-muted/30 px-4 py-2 flex items-center gap-2 border-y border-border/40 first:border-t-0">
+                    <div className="size-2 rounded-full" style={{ backgroundColor: materia?.color || '#f59e0b' }} />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                      {materia?.nombre || "Materia desconocida"}
+                    </span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-xs font-mono text-primary">{new Date(e.fecha).toLocaleDateString()}</div>
-                    <div className="text-[10px] text-muted-foreground">{e.hora}</div>
-                  </div>
-                </li>
+                  <ul className="divide-y divide-border/30">
+                    {items.map((e) => (
+                      <li key={e.id} className="px-4 py-3 flex items-center justify-between gap-4 hover:bg-muted/10 transition-colors">
+                        <div className="min-w-0">
+                          <div className="font-medium truncate text-sm uppercase tracking-tight text-foreground/90">{e.tematica}</div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-muted-foreground lowercase">{e.plataforma}</span>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="text-xs font-mono font-semibold text-primary">
+                            {new Date(e.fecha + "T00:00:00").toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">{e.hora}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
       </CardContent>
     </Card>
