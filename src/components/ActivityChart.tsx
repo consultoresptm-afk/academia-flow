@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useMemo } from "react";
 
 /**
  * GaugeChart — Velocímetro SVG de "Avance General"
@@ -47,8 +48,12 @@ function GaugeSVG({ value }: { value: number }) {
   const ny = cy + needleLen * Math.sin(nRad);
 
   // Color actual según valor
+  const currentCredits = (pct * 38) / 100;
   const currentColor = pct < 40 ? "#ef4444" : pct < 70 ? "#f97316" : "#22c55e";
-  const label = pct < 40 ? "CRÍTICO" : pct < 70 ? "EN PROGRESO" : "EXCELENTE";
+  
+  let label = "FUNDAMENTACIÓN";
+  if (currentCredits > 26) label = "TRASCENDENCIA";
+  else if (currentCredits > 12) label = "INTEGRACIÓN";
 
   return (
     <svg viewBox="0 0 240 180" className="w-full max-w-xs mx-auto select-none">
@@ -163,7 +168,7 @@ export function AvanceGaugeChart() {
     enabled: !!user,
     queryKey: ["trabajos-dashboard", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("trabajos").select("estado, peso, materia_id");
+      const { data } = await supabase.from("trabajos").select("estado, peso, materia_id, trayecto, tipo_actividad, nota");
       return data ?? [];
     },
   });
@@ -171,37 +176,41 @@ export function AvanceGaugeChart() {
   // Calcular % de avance basado en créditos (Meta: 38 créditos)
   const TOTAL_CREDITOS_PROGRAMA = 38;
 
-  const avance = (() => {
-    if (!materias.length && !trabajos.length) return 0;
+  const { avance, creditosGanados } = useMemo(() => {
+    if (!materias.length) return { avance: 0, creditosGanados: 0 };
     
-    let creditosGanados = 0;
+    let totalGanados = 0;
 
     materias.forEach(m => {
       const trabajosMateria = trabajos.filter(t => t.materia_id === m.id);
-      const creditosMateria = m.creditos || 2; // Default 2 si no está definido (19 * 2 = 38)
+      const creditosMateria = m.creditos || 2; 
       
       if (m.estado === "archivado") {
-        // Si la materia está archivada, ya se completó.
-        creditosGanados += creditosMateria;
-      } else if (trabajosMateria.length > 0) {
-        const totalPeso = trabajosMateria.reduce((s, t) => s + (t.peso || 1), 0);
-        const completadoPeso = trabajosMateria
-          .filter(t => t.estado === "entrega")
-          .reduce((s, t) => s + (t.peso || 1), 0);
-        
-        const porcentajeMateria = totalPeso > 0 ? (completadoPeso / totalPeso) : 0;
-        creditosGanados += creditosMateria * porcentajeMateria;
+        totalGanados += creditosMateria;
+      } else if (m.estado === "activo") {
+        // Lógica de 10 hitos: 3 trayectos con 3 actividades + 1 autoevaluación
+        const t1 = trabajosMateria.filter(t => t.trayecto === 1 && t.nota !== null).length;
+        const t2 = trabajosMateria.filter(t => t.trayecto === 2 && t.nota !== null).length;
+        const t3 = trabajosMateria.filter(t => t.trayecto === 3 && t.nota !== null).length;
+        const auto = trabajosMateria.filter(t => t.tipo_actividad === "Autoevaluación" && t.nota !== null).length;
+
+        const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
+        const porcentajeMateria = hitosCompletados / 10;
+        totalGanados += creditosMateria * porcentajeMateria;
       }
     });
 
-    return (creditosGanados / TOTAL_CREDITOS_PROGRAMA) * 100;
-  })();
+    return {
+      avance: (totalGanados / TOTAL_CREDITOS_PROGRAMA) * 100,
+      creditosGanados: totalGanados
+    };
+  }, [materias, trabajos]);
 
   const stats = {
     total: trabajos.length,
     entregados: trabajos.filter((t) => t.estado === "entrega").length,
     pendientes: trabajos.filter((t) => t.estado !== "entrega").length,
-    creditos: avance * (TOTAL_CREDITOS_PROGRAMA / 100)
+    creditos: creditosGanados
   };
 
   return (
@@ -210,16 +219,20 @@ export function AvanceGaugeChart() {
 
       {/* Leyenda inferior */}
       <div className="flex items-center gap-4 mt-2">
-        {[
-          { label: "CRÉDITOS", value: stats.creditos.toFixed(1), color: "#d4a574" },
-          { label: "ENTREGADOS", value: stats.entregados, color: "#22c55e" },
-          { label: "PENDIENTES", value: stats.pendientes, color: "#f97316" },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="text-center">
-            <div className="text-lg font-bold font-serif" style={{ color }}>{value}</div>
-            <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{label}</div>
+        <div className="text-center">
+          <div className="text-lg font-bold font-serif text-[#d4a574]">
+            {stats.creditos.toFixed(1)} / 38
           </div>
-        ))}
+          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">CRÉDITOS</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold font-serif text-[#22c55e]">{stats.entregados}</div>
+          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">ENTREGADOS</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold font-serif text-[#f97316]">{stats.pendientes}</div>
+          <div className="text-[9px] uppercase tracking-widest text-muted-foreground">PENDIENTES</div>
+        </div>
       </div>
     </div>
   );

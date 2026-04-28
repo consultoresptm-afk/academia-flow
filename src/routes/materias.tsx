@@ -78,40 +78,42 @@ function MateriasPage() {
     }
   }, [materias, selectedId]);
 
-  // Cargar notas para calcular el progreso visual de cada materia
-  const { data: trabajosConNota = [] } = useQuery({
+  // Cargar trabajos para calcular el progreso visual de cada materia
+  const { data: trabajosMateria = [] } = useQuery({
     enabled: !!user && materias.length > 0,
-    queryKey: ["trabajos-todas-notas", user?.id],
+    queryKey: ["trabajos-progreso-materias", user?.id],
     queryFn: async () => {
       const { data } = await supabase
         .from("trabajos")
-        .select("materia_id, nota, peso")
-        .not("nota", "is", null)
-        .not("materia_id", "is", null);
+        .select("materia_id, nota, trayecto, tipo_actividad")
+        .eq("user_id", user?.id || "");
       return data ?? [];
     },
   });
 
-  // Calcular progreso promedio por materia (escala 0-100)
+  // Calcular progreso por materia (escala 0-100) basado en 10 hitos
   const progresos = useMemo(() => {
     const map: Record<string, number> = {};
     materias.forEach((m) => {
-      // Si la materia está archivada, el progreso es siempre 100%
       if (m.estado === "archivado") {
         map[m.id] = 100;
         return;
       }
-      const notas = trabajosConNota.filter((t) => t.materia_id === m.id);
-      if (!notas.length) { map[m.id] = 0; return; }
-      const totalPeso = notas.reduce((s, t) => s + (t.peso ?? 0), 0);
-      const promedio = totalPeso > 0
-        ? notas.reduce((s, t) => s + (t.nota ?? 0) * (t.peso ?? 0), 0) / totalPeso
-        : notas.reduce((s, t) => s + (t.nota ?? 0), 0) / notas.length;
-      // Convertir a escala 0-100 (asumiendo notas en escala 0-100)
-      map[m.id] = Math.min(100, Math.max(0, promedio));
+      
+      const trabajos = trabajosMateria.filter((t) => t.materia_id === m.id);
+      if (!trabajos.length) { map[m.id] = 0; return; }
+
+      // Lógica de 10 hitos: 3 trayectos con 3 actividades + 1 autoevaluación
+      const t1 = trabajos.filter(t => t.trayecto === 1 && t.nota !== null).length;
+      const t2 = trabajos.filter(t => t.trayecto === 2 && t.nota !== null).length;
+      const t3 = trabajos.filter(t => t.trayecto === 3 && t.nota !== null).length;
+      const auto = trabajos.filter(t => t.tipo_actividad === "Autoevaluación" && t.nota !== null).length;
+
+      const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
+      map[m.id] = (hitosCompletados / 10) * 100;
     });
     return map;
-  }, [materias, trabajosConNota]);
+  }, [materias, trabajosMateria]);
 
   const selectedMateria = materias.find((m) => m.id === selectedId) ?? null;
 

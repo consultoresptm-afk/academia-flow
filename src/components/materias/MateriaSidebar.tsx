@@ -98,8 +98,8 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                   </span>
                 </div>
 
-                {/* Botones acciones (solo hover) */}
-                <div className="absolute right-2 top-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Botones acciones (siempre visibles) */}
+                <div className="absolute right-2 top-2 flex items-center gap-1 opacity-100 transition-opacity">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

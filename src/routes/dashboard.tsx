@@ -37,6 +37,14 @@ function DashboardPage() {
   };
 
 
+  // Sincronización automática al montar el componente
+  useEffect(() => {
+    if (user?.id) {
+      queryClient.invalidateQueries({ queryKey: ["materias", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["trabajos-dashboard", user.id] });
+    }
+  }, [user?.id, queryClient]);
+
   const { data: materias } = useQuery({
     enabled: !!user,
     queryKey: ["materias", user?.id],
@@ -45,6 +53,8 @@ function DashboardPage() {
       if (error) throw error;
       return data ?? [];
     },
+    staleTime: 0,
+    refetchOnWindowFocus: true
   });
 
   const { data: trabajos } = useQuery({

@@ -199,12 +199,12 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr>
-                <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Evaluación</th>
-                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Trayecto</th>
-                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Tipo Actividad</th>
-                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Tipo</th>
-                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Peso</th>
-                <th className="text-center px-3 py-2.5 font-medium text-muted-foreground">Nota</th>
+                <th className="text-left px-4 py-2.5 font-bold text-primary">Evaluación</th>
+                <th className="text-center px-3 py-2.5 font-bold text-primary">Trayecto</th>
+                <th className="text-center px-3 py-2.5 font-bold text-primary">Tipo Actividad</th>
+                <th className="text-center px-3 py-2.5 font-bold text-primary">Tipo</th>
+                <th className="text-center px-3 py-2.5 font-bold text-primary">Peso</th>
+                <th className="text-center px-3 py-2.5 font-bold text-primary">Nota</th>
                 <th className="w-20"></th>
               </tr>
             </thead>
@@ -240,12 +240,12 @@ export function NotasTab({ materiaId }: { materiaId: string }) {
                     )}
                   </td>
                   <td className="px-2 py-3 text-right">
-                    <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)}>
+                    <Button size="icon" variant="ghost" className="size-7 text-primary hover:bg-primary/20" onClick={() => openEdit(t)}>
                       <Pencil className="size-3.5" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="size-7"
+                    <Button size="icon" variant="ghost" className="size-7 text-destructive hover:bg-destructive/20"
                       onClick={() => { if (confirm(`¿Eliminar "${t.titulo}"?`)) remove.mutate(t.id); }}>
-                      <Trash2 className="size-3.5 text-destructive" />
+                      <Trash2 className="size-3.5" />
                     </Button>
                   </td>
                 </tr>
