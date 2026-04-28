@@ -105,7 +105,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                       e.stopPropagation();
                       onEdit(m);
                     }}
-                    className="p-1 rounded text-muted-foreground transition-colors"
+                    className="p-1 rounded text-foreground/80 hover:text-primary transition-colors bg-background/40"
                     aria-label="Editar materia"
                   >
                     <Pencil className="size-3" />
@@ -115,7 +115,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                       e.stopPropagation();
                       if (confirm(`¿Eliminar "${m.nombre}"?`)) removeMutation.mutate(m.id);
                     }}
-                    className="p-1 rounded text-destructive transition-colors"
+                    className="p-1 rounded text-destructive hover:bg-destructive/10 transition-colors bg-background/40"
                     aria-label="Eliminar materia"
                   >
                     <Trash2 className="size-3" />
