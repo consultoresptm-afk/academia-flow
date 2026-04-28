@@ -77,7 +77,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                 {/* Color dot + nombre */}
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="size-2.5 rounded-full shrink-0" style={{ backgroundColor: m.color ?? "#16a34a" }} />
-                  <span className={cn("text-sm font-medium truncate", isSelected && "text-primary")}>
+                  <span className={cn("text-sm font-medium", isSelected && "text-primary")}>
                     {m.nombre}
                   </span>
                 </div>
@@ -86,7 +86,7 @@ export function MateriaSidebar({ materias, selectedId, onSelect, onCreate, onEdi
                 {m.docente && (
                   <div className="flex items-center gap-1 mt-1 ml-4">
                     <User className="size-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground truncate">{m.docente}</span>
+                    <span className="text-xs text-muted-foreground">{m.docente}</span>
                   </div>
                 )}
 

@@ -121,7 +121,7 @@ function GaugeSVG({ value }: { value: number }) {
       <text x={cx} y={cy + 32} textAnchor="middle"
         fontSize={22} fontWeight="bold" fill={currentColor}
         fontFamily="Rajdhani, Inter, sans-serif" filter="url(#glow-text)">
-        {pct.toFixed(1)}%
+        {(Math.floor(pct * 10) / 10).toFixed(1)}%
       </text>
 
       {/* Etiqueta de estado */}
@@ -195,7 +195,7 @@ export function AvanceGaugeChart() {
         const t1 = trabajosMateria.filter(t => t.trayecto === 1 && isCompleted(t)).length;
         const t2 = trabajosMateria.filter(t => t.trayecto === 2 && isCompleted(t)).length;
         const t3 = trabajosMateria.filter(t => t.trayecto === 3 && isCompleted(t)).length;
-        const auto = trabajosMateria.filter(t => (t.tipo_actividad === "Autoevaluación" || t.tipo === "autoevaluación") && isCompleted(t)).length;
+        const auto = trabajosMateria.filter(t => t.tipo_actividad === "Autoevaluación" && isCompleted(t)).length;
 
         const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
         const porcentajeMateria = hitosCompletados / 10;

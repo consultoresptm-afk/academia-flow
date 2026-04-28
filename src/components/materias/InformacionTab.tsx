@@ -123,9 +123,9 @@ export function InformacionTab({ materia }: { materia: Materia }) {
           label="Carga Académica" 
           value={materia.creditos ? `${materia.creditos} Créditos` : "—"} 
         />
-        <Card className="border-primary/30 bg-primary/10 backdrop-blur-sm group hover:border-primary/50 transition-all duration-300">
+        <Card className="border-primary/50 bg-primary/10 backdrop-blur-sm group transition-all duration-300">
           <CardContent className="p-4 flex items-center gap-4">
-            <div className="size-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-glow-sm">
+            <div className="size-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground transition-colors shadow-glow-sm">
               <Trophy className="size-5" />
             </div>
             <div>
@@ -239,9 +239,9 @@ export function InformacionTab({ materia }: { materia: Materia }) {
 
 function InfoCard({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
   return (
-    <Card className="border-border/40 bg-card/50 backdrop-blur-sm group hover:border-primary/30 transition-all duration-300">
+    <Card className="border-primary/30 bg-card/50 backdrop-blur-sm group transition-all duration-300">
       <CardContent className="p-4 flex items-center gap-4">
-        <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+        <div className="size-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground transition-colors">
           <Icon className="size-5" />
         </div>
         <div>

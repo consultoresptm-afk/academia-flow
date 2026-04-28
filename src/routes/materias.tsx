@@ -85,7 +85,7 @@ function MateriasPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("trabajos")
-        .select("materia_id, nota, trayecto, tipo_actividad")
+        .select("materia_id, nota, trayecto, tipo_actividad, estado")
         .eq("user_id", user?.id || "");
       return data ?? [];
     },
@@ -110,7 +110,7 @@ function MateriasPage() {
       const t1 = trabajos.filter(t => t.trayecto === 1 && isCompleted(t)).length;
       const t2 = trabajos.filter(t => t.trayecto === 2 && isCompleted(t)).length;
       const t3 = trabajos.filter(t => t.trayecto === 3 && isCompleted(t)).length;
-      const auto = trabajos.filter(t => (t.tipo_actividad === "Autoevaluación" || t.tipo === "autoevaluación") && isCompleted(t)).length;
+      const auto = trabajos.filter(t => t.tipo_actividad === "Autoevaluación" && isCompleted(t)).length;
 
       const hitosCompletados = Math.min(3, t1) + Math.min(3, t2) + Math.min(3, t3) + Math.min(1, auto);
       map[m.id] = (hitosCompletados / 10) * 100;
