@@ -1,77 +1,118 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Video, Calendar, Clock, ExternalLink, AlertCircle } from "lucide-react";
+import { Video, Calendar, Clock, ExternalLink, PlayCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+const MOCK_ENCUENTROS = [
+  {
+    id: "1",
+    fecha: "2026-05-12",
+    hora: "18:00 - 20:00",
+    tematica: "Introducción a la Estrategia Sostenible y Modelos ASG",
+    estado: "programado",
+    plataforma: "Teams"
+  },
+  {
+    id: "2",
+    fecha: "2026-05-19",
+    hora: "18:00 - 20:00",
+    tematica: "Análisis de Riesgos Ambientales en la Cadena de Valor",
+    estado: "programado",
+    plataforma: "Teams"
+  },
+  {
+    id: "3",
+    fecha: "2026-04-21",
+    hora: "18:30 - 20:30",
+    tematica: "Sesión de Nivelación: Fundamentos de Economía Circular",
+    estado: "grabado",
+    plataforma: "Zoom"
+  }
+];
 
 export function EncuentrosTab({ materiaId }: { materiaId: string }) {
-  // Por ahora mostramos una interfaz elegante de "No hay encuentros" 
-  // ya que no hay una tabla específica en DB, o tal vez se gestionaban externamente.
-  
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-medium">Encuentros Sincrónicos</h3>
-          <p className="text-xs text-muted-foreground">Accede a las clases en vivo y grabaciones de esta materia.</p>
+        <div className="flex items-center gap-3">
+          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <Video className="size-5" />
+          </div>
+          <div>
+            <h3 className="font-medium text-lg">Encuentros Sincrónicos</h3>
+            <p className="text-xs text-muted-foreground">Sesiones en vivo y biblioteca de grabaciones.</p>
+          </div>
         </div>
-        <Button size="sm" variant="outline" className="gap-2">
-          <Calendar className="size-4" /> Ver calendario
+        <Button size="sm" variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5 hover:text-primary">
+          <Calendar className="size-4" /> Calendario Completo
         </Button>
       </div>
 
-      <Card className="border-dashed border-2 bg-muted/20">
-        <CardContent className="p-10 flex flex-col items-center justify-center text-center">
-          <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Video className="size-8 text-primary" />
+      <div className="grid gap-4">
+        {MOCK_ENCUENTROS.map((encuentro) => (
+          <EncuentroItem key={encuentro.id} encuentro={encuentro} />
+        ))}
+      </div>
+
+      <Card className="border-primary/20 bg-primary/5 border-dashed">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Users className="size-5 text-primary" />
+            <span className="text-sm font-medium">¿Necesitas una tutoría personalizada?</span>
           </div>
-          <h4 className="font-serif text-xl mb-2">No hay encuentros programados</h4>
-          <p className="text-sm text-muted-foreground max-w-sm mb-6">
-            Cuando se programen sesiones sincrónicas o se publiquen enlaces de clases grabadas, aparecerán en este apartado.
-          </p>
-          <div className="flex gap-3">
-            <Button variant="secondary" className="gap-2">
-              <Clock className="size-4" /> Ver historial
-            </Button>
-            <Button className="gap-2">
-              <ExternalLink className="size-4" /> Ir a plataforma LMS
-            </Button>
-          </div>
+          <Button variant="link" className="text-primary text-xs h-auto p-0">Solicitar encuentro individual</Button>
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-50 grayscale pointer-events-none">
-        <MockEncuentro 
-          titulo="Sesión de Bienvenida" 
-          fecha="Lunes, 12 de Mayo" 
-          hora="6:00 PM" 
-          plataforma="Microsoft Teams" 
-        />
-        <MockEncuentro 
-          titulo="Taller Práctico #1" 
-          fecha="Miércoles, 14 de Mayo" 
-          hora="7:30 PM" 
-          plataforma="Zoom" 
-        />
-      </div>
     </div>
   );
 }
 
-function MockEncuentro({ titulo, fecha, hora, plataforma }: any) {
+function EncuentroItem({ encuentro }: { encuentro: typeof MOCK_ENCUENTROS[0] }) {
+  const isProgramado = encuentro.estado === "programado";
+  
   return (
-    <Card className="border-border/40">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <Badge variant="outline" className="text-[10px] uppercase tracking-tighter">{plataforma}</Badge>
-          <div className="size-2 rounded-full bg-green-500 animate-pulse" />
-        </div>
-        <h5 className="font-medium text-sm mb-1">{titulo}</h5>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><Calendar className="size-3" /> {fecha}</span>
-          <span className="flex items-center gap-1"><Clock className="size-3" /> {hora}</span>
+    <Card className="border-border/40 bg-card/50 overflow-hidden hover:border-primary/30 transition-all group">
+      <CardContent className="p-0">
+        <div className="flex flex-col md:flex-row items-stretch">
+          {/* Fecha y Hora */}
+          <div className="md:w-48 bg-muted/30 p-4 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border/40">
+            <div className="flex items-center gap-2 text-primary mb-1">
+              <Calendar className="size-3.5" />
+              <span className="text-xs font-semibold uppercase tracking-wider">{new Date(encuentro.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="size-3.5" />
+              <span className="text-xs font-medium">{encuentro.hora}</span>
+            </div>
+          </div>
+
+          {/* Temática y Acción */}
+          <div className="flex-1 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge variant={isProgramado ? "outline" : "secondary"} className={`text-[10px] px-1.5 py-0 ${isProgramado ? 'text-blue-500 border-blue-500/30' : 'text-muted-foreground'}`}>
+                  {encuentro.plataforma}
+                </Badge>
+                {!isProgramado && <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-orange-500 border-orange-500/30">Grabación disponible</Badge>}
+              </div>
+              <h4 className="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">{encuentro.tematica}</h4>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {isProgramado ? (
+                <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20">
+                  <ExternalLink className="size-3.5" /> Unirse a la sesión
+                </Button>
+              ) : (
+                <Button size="sm" variant="secondary" className="gap-2">
+                  <PlayCircle className="size-3.5" /> Ver grabación
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-import { Badge } from "@/components/ui/badge";

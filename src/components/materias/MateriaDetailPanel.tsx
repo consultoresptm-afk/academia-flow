@@ -65,7 +65,10 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
         <Tabs defaultValue="informacion">
           <TabsList className="w-full flex-wrap h-auto gap-1 bg-transparent p-0">
             <TabsTrigger value="informacion" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
-              <Info className="size-4 mr-2" />Información
+              <Info className="size-4 mr-2" />Información General
+            </TabsTrigger>
+            <TabsTrigger value="encuentros" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
+              <Video className="size-4 mr-2" />Encuentros Sincrónicos
             </TabsTrigger>
             <TabsTrigger value="notas" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <Star className="size-4 mr-2" />Notas
@@ -73,16 +76,17 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
             <TabsTrigger value="tareas" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <CheckCircle2 className="size-4 mr-2" />Tareas
             </TabsTrigger>
-            <TabsTrigger value="encuentros" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
-              <Video className="size-4 mr-2" />Encuentros
-            </TabsTrigger>
             <TabsTrigger value="repositorio" className="flex-1 data-[state=active]:bg-primary/10 data-[state=active]:text-primary border border-transparent data-[state=active]:border-primary/20 transition-all">
               <FileText className="size-4 mr-2" />Repositorio
             </TabsTrigger>
           </TabsList>
+
           
           <TabsContent value="informacion" className="mt-6">
             <InformacionTab materia={materia} />
+          </TabsContent>
+          <TabsContent value="encuentros" className="mt-6">
+            <EncuentrosTab materiaId={materia.id} />
           </TabsContent>
           <TabsContent value="notas" className="mt-6">
             <NotasTab materiaId={materia.id} />
@@ -90,12 +94,10 @@ export function MateriaDetailPanel({ materia }: { materia: Materia }) {
           <TabsContent value="tareas" className="mt-6">
             <TareasTab materiaId={materia.id} />
           </TabsContent>
-          <TabsContent value="encuentros" className="mt-6">
-            <EncuentrosTab materiaId={materia.id} />
-          </TabsContent>
           <TabsContent value="repositorio" className="mt-6">
             <RepositorioTab materiaId={materia.id} />
           </TabsContent>
+
         </Tabs>
       </div>
     </div>
