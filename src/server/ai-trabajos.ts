@@ -40,7 +40,24 @@ export const generarContenido = createServerFn({ method: "POST" })
   .inputValidator((input: GenInput) => input)
   .handler(async ({ data }) => {
     const palabras = (data.paginas ?? 5) * 300;
-    const system = `Eres un experto académico. Redacta trabajos universitarios rigurosos, bien estructurados, con introducción, desarrollo argumentado y conclusiones. Usa lenguaje formal en español, cita en formato APA 7ª cuando corresponda con marcador [REF: descripción] y mantén coherencia. Extensión objetivo: ~${palabras} palabras.`;
+    const system = `Eres un experto académico de alto nivel. Redacta trabajos universitarios rigurosos, bien estructurados y profesionales.
+
+REGLAS DE FORMATO CRÍTICAS:
+1. TABLAS Y MATRICES:
+   - Usa EXCLUSIVAMENTE formato Markdown estándar (| Encabezado |).
+   - Prohibido el uso de barras laterales decorativas, bordes de caracteres ASCII o saltos de línea manuales dentro de celdas.
+   - Cada tabla debe ir precedida por un título numerado en una línea independiente (Ej: "Tabla 1. Matriz de Interesados").
+   - Sigue las normas APA 7ª: contenido claro, sin truncar información.
+
+2. VISUALIZACIÓN Y GRÁFICOS:
+   - Cuando el contenido involucre datos comparativos, cuantitativos o financieros, propón un "BLOQUE DE VISUALIZACIÓN".
+   - Estructura estos bloques como una tabla resumen o una lista jerárquica clara que sintetice los hallazgos para facilitar la toma de decisiones.
+
+3. ESTRUCTURA GENERAL:
+   - Usa lenguaje formal en español.
+   - Cita en formato APA 7ª cuando corresponda con marcador [REF: descripción].
+   - Extensión objetivo: ~${palabras} palabras.
+   - Usa encabezados Markdown (## Título).`;
 
     const user = `Redacta un ${data.tipo} titulado: "${data.titulo}".
 ${data.descripcion ? `\nContexto: ${data.descripcion}` : ""}
@@ -48,7 +65,7 @@ ${data.instrucciones ? `\nInstrucciones del docente: ${data.instrucciones}` : ""
 ${data.objetivos ? `\nObjetivos: ${data.objetivos}` : ""}
 ${data.palabrasClave?.length ? `\nPalabras clave: ${data.palabrasClave.join(", ")}` : ""}
 
-Estructura el documento con encabezados claros (## Introducción, ## Desarrollo, ## Conclusiones).`;
+Estructura el documento con una jerarquía clara. Asegúrate de incluir tablas profesionales si el tema lo permite (ej. Matrices de análisis, comparativas, etc.).`;
 
     const contenido = await callAI([
       { role: "system", content: system },
@@ -73,14 +90,14 @@ Técnicas a aplicar:
 4. Añade transiciones más naturales entre ideas
 5. Usa construcciones más conversacionales donde sea apropiado
 6. Mantén el nivel académico y formal requerido
-7. Preserva todas las citas, referencias y encabezados Markdown
+7. Preserva todas las citas, referencias, encabezados y tablas Markdown
 8. Asegúrate de que el contenido sea único
 
 Responde SOLO con el contenido humanizado, sin explicaciones adicionales.`;
 
     const humanizado = await callAI([
       { role: "system", content: system },
-      { role: "user", content: `Humaniza este contenido académico:\n\n${data.contenido}` },
+      { role: "user", content: `Humaniza este contenido académico preservando estrictamente el formato de tablas y encabezados:\n\n${data.contenido}` },
     ]);
 
     return { contenido: humanizado };

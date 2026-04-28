@@ -1,6 +1,7 @@
 import {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
-  PageOrientation, Header, PageNumber, Footer,
+  PageOrientation, Header, PageNumber, Footer, Table, TableRow, TableCell,
+  BorderStyle, WidthType,
 } from "docx";
 
 type ExportInput = {
@@ -25,16 +26,13 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     year: "numeric", month: "long", day: "numeric",
   });
 
-  // ===== PORTADA APA 7ª (centrada, doble espacio, sin número de página visible
-  // — APA estudiantil permite numeración desde la portada) =====
+  // ===== PORTADA APA 7ª (centrada, doble espacio, sin número de página visible) =====
   const portada: Paragraph[] = [];
 
-  // Espacio superior: APA recomienda título en la mitad superior (~3-4 líneas en blanco)
   for (let i = 0; i < 4; i++) {
     portada.push(blankLine());
   }
 
-  // Título en negrita, centrado
   portada.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -44,7 +42,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
   );
   portada.push(blankLine());
 
-  // Autor
   portada.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -53,7 +50,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     })
   );
 
-  // Institución / Programa
   portada.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -62,7 +58,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     })
   );
 
-  // Curso
   if (input.curso) {
     portada.push(
       new Paragraph({
@@ -73,7 +68,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     );
   }
 
-  // Docente
   if (input.docente) {
     portada.push(
       new Paragraph({
@@ -84,7 +78,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     );
   }
 
-  // Fecha
   portada.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -93,10 +86,8 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     })
   );
 
-  // Salto de página tras la portada
   portada.push(new Paragraph({ pageBreakBefore: true, children: [] }));
 
-  // ===== TÍTULO DEL TRABAJO repetido en p.2 (APA 7ª) =====
   portada.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -105,21 +96,74 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     })
   );
 
-  // ===== CUERPO: parsea Markdown ligero a estilos APA =====
-  const cuerpo: Paragraph[] = [];
+  // ===== CUERPO: parsea Markdown a estilos APA y Tablas =====
+  const children: (Paragraph | Table)[] = [];
   const lines = input.contenido.split("\n");
 
-  for (const raw of lines) {
-    const line = raw.trimEnd();
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trim();
 
-    if (!line.trim()) {
-      // Mantener líneas en blanco no produce dobles espacios extra (interlineado ya es doble)
+    if (!line) continue;
+
+    // Detección de Título de Tabla (Ej: "Tabla 1. Matriz de Interesados")
+    if (line.match(/^Tabla\s+\d+[:.]/i) && i + 1 < lines.length && lines[i + 1].trim().startsWith("|")) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { line: LINE_DOUBLE, before: 240, after: 0 },
+          children: [new TextRun({ text: line, italics: true, size: SIZE, font: FONT })],
+        })
+      );
       continue;
     }
 
-    // Nivel 1 APA: centrado, negrita, mayúsculas y minúsculas
+    // Detección de Tabla Markdown
+    if (line.startsWith("|")) {
+      const tableRows: string[][] = [];
+      while (i < lines.length && (lines[i].trim().startsWith("|") || lines[i].trim() === "")) {
+        const rowText = lines[i].trim();
+        if (rowText.startsWith("|")) {
+          const cells = rowText.split("|").filter((_, idx, arr) => idx > 0 && idx < arr.length - 1).map(c => c.trim());
+          // Ignorar fila de separación |---|---|
+          if (!cells.every(c => c.match(/^[- :]+$/))) {
+            tableRows.push(cells);
+          }
+        }
+        i++;
+      }
+      i--; // retroceder para no saltar la siguiente línea válida en el for
+
+      if (tableRows.length > 0) {
+        children.push(createAPATable(tableRows));
+      }
+      continue;
+    }
+
+    // Bloques de Visualización (Stylized summary)
+    if (line.toUpperCase().includes("BLOQUE DE VISUALIZACIÓN")) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          border: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "666666" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "666666" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "666666" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "666666" },
+          },
+          shading: { fill: "F9FAFB" },
+          spacing: { before: 240, after: 240, line: 360 },
+          children: [
+            new TextRun({ text: line, bold: true, size: SIZE, font: FONT }),
+          ],
+        })
+      );
+      continue;
+    }
+
+    // Nivel 1 APA: centrado, negrita
     if (line.startsWith("# ")) {
-      cuerpo.push(
+      children.push(
         new Paragraph({
           alignment: AlignmentType.CENTER,
           spacing: { line: LINE_DOUBLE, before: 240, after: 0 },
@@ -129,9 +173,9 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
       continue;
     }
 
-    // Nivel 2 APA: alineado a la izquierda, negrita
+    // Nivel 2 APA: izquierda, negrita
     if (line.startsWith("## ")) {
-      cuerpo.push(
+      children.push(
         new Paragraph({
           heading: HeadingLevel.HEADING_2,
           alignment: AlignmentType.LEFT,
@@ -142,9 +186,9 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
       continue;
     }
 
-    // Nivel 3 APA: alineado a la izquierda, negrita y cursiva
+    // Nivel 3 APA: izquierda, negrita y cursiva
     if (line.startsWith("### ")) {
-      cuerpo.push(
+      children.push(
         new Paragraph({
           heading: HeadingLevel.HEADING_3,
           alignment: AlignmentType.LEFT,
@@ -155,20 +199,18 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
       continue;
     }
 
-    // Párrafo normal: sangría primera línea 0.5", interlineado doble, alineado a la izquierda
-    // (APA 7ª permite alineación a la izquierda; no se recomienda justificación)
-    cuerpo.push(
+    // Párrafo normal
+    children.push(
       new Paragraph({
         alignment: AlignmentType.LEFT,
         spacing: { line: LINE_DOUBLE, after: 0 },
         indent: { firstLine: INDENT_FIRST },
-        children: parseInline(line),
+        children: parseInline(raw), // Usar raw para preservar espacios si fuera necesario
       })
     );
   }
 
-  // ===== REFERENCIAS APA 7ª: nueva página, título centrado en negrita,
-  // entradas con sangría francesa de 0.5" y orden alfabético =====
+  // ===== REFERENCIAS APA 7ª =====
   const referenciasParagraphs: Paragraph[] = [];
   if (input.referencias?.length) {
     referenciasParagraphs.push(new Paragraph({ pageBreakBefore: true, children: [] }));
@@ -190,7 +232,6 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
         new Paragraph({
           alignment: AlignmentType.LEFT,
           spacing: { line: LINE_DOUBLE, after: 0 },
-          // Sangría francesa: indent.left define el margen y hanging desplaza la 1ª línea
           indent: { left: INDENT_FIRST, hanging: INDENT_FIRST },
           children: parseInline(ref),
         })
@@ -198,50 +239,68 @@ export async function exportarTrabajoWord(input: ExportInput): Promise<Blob> {
     }
   }
 
-  // ===== Documento APA: márgenes 1", encabezado con número de página
-  // alineado a la derecha (APA 7ª estudiantil) =====
   const doc = new Document({
     styles: {
-      default: {
-        document: { run: { font: FONT, size: SIZE } },
-      },
+      default: { document: { run: { font: FONT, size: SIZE } } },
     },
     sections: [{
       properties: {
         page: {
-          size: {
-            width: 12240,   // 8.5"
-            height: 15840,  // 11"
-            orientation: PageOrientation.PORTRAIT,
-          },
+          size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
           margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN },
         },
       },
-      // Encabezado APA 7ª: número de página alineado a la derecha
       headers: {
         default: new Header({
           children: [
             new Paragraph({
               alignment: AlignmentType.RIGHT,
-              children: [
-                new TextRun({
-                  children: [PageNumber.CURRENT],
-                  font: FONT,
-                  size: SIZE,
-                }),
-              ],
+              children: [new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: SIZE })],
             }),
           ],
         }),
       },
-      footers: {
-        default: new Footer({ children: [new Paragraph({ children: [] })] }),
-      },
-      children: [...portada, ...cuerpo, ...referenciasParagraphs],
+      children: [...portada, ...children, ...referenciasParagraphs],
     }],
   });
 
   return await Packer.toBlob(doc);
+}
+
+function createAPATable(rows: string[][]): Table {
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: {
+      top: { style: BorderStyle.NONE },
+      bottom: { style: BorderStyle.NONE },
+      left: { style: BorderStyle.NONE },
+      right: { style: BorderStyle.NONE },
+      insideHorizontal: { style: BorderStyle.NONE },
+      insideVertical: { style: BorderStyle.NONE },
+    },
+    rows: rows.map((cells, rowIndex) => {
+      const isHeader = rowIndex === 0;
+      return new TableRow({
+        children: cells.map(cellText => {
+          return new TableCell({
+            borders: {
+              top: isHeader ? { style: BorderStyle.SINGLE, size: 4 } : { style: BorderStyle.NONE },
+              bottom: (isHeader || rowIndex === rows.length - 1) ? { style: BorderStyle.SINGLE, size: 4 } : { style: BorderStyle.NONE },
+              left: { style: BorderStyle.NONE },
+              right: { style: BorderStyle.NONE },
+            },
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.BOTH, // Texto justificado como se pidió
+                spacing: { line: 240, before: 120, after: 120 },
+                children: [new TextRun({ text: cellText, size: SIZE, font: FONT, bold: isHeader })],
+              })
+            ],
+          });
+        }),
+      });
+    }),
+  });
 }
 
 function blankLine(): Paragraph {
@@ -251,7 +310,6 @@ function blankLine(): Paragraph {
   });
 }
 
-// Parsea *cursiva* y **negrita** simples manteniendo fuente y tamaño APA
 function parseInline(text: string): TextRun[] {
   const runs: TextRun[] = [];
   const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
@@ -274,3 +332,4 @@ function parseInline(text: string): TextRun[] {
   }
   return runs.length ? runs : [new TextRun({ text, font: FONT, size: SIZE })];
 }
+
