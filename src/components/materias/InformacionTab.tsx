@@ -1,12 +1,40 @@
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Materia } from "@/types/materias";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, User, Calendar, Info, Hash, GraduationCap, Target, Lightbulb } from "lucide-react";
+import { BookOpen, User, Calendar, Info, Hash, GraduationCap, Target, Lightbulb, Trophy } from "lucide-react";
+
 
 export function InformacionTab({ materia }: { materia: Materia }) {
+  const { data: trabajos = [] } = useQuery({
+    queryKey: ["materia-notas", materia.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trabajos")
+        .select("nota, peso")
+        .eq("materia_id", materia.id);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const statsGrades = useMemo(() => {
+    const conNota = trabajos.filter((t) => t.nota !== null);
+    const totalPeso = conNota.reduce((s, t) => s + (Number(t.peso) || 0), 0);
+    const promedio = totalPeso > 0
+      ? conNota.reduce((s, t) => s + (Number(t.nota) || 0) * (Number(t.peso) || 0), 0) / totalPeso
+      : conNota.length > 0
+        ? conNota.reduce((s, t) => s + (Number(t.nota) || 0), 0) / conNota.length
+        : 0;
+    return { promedio, count: conNota.length };
+  }, [trabajos]);
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+
       {/* Cards de Información Rápida */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <InfoCard 
           icon={Hash} 
           label="Código de Materia" 
@@ -22,6 +50,19 @@ export function InformacionTab({ materia }: { materia: Materia }) {
           label="Carga Académica" 
           value={materia.creditos ? `${materia.creditos} Créditos` : "2 Créditos"} 
         />
+        <Card className="border-primary/30 bg-primary/10 backdrop-blur-sm group hover:border-primary/50 transition-all duration-300">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="size-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-glow-sm">
+              <Trophy className="size-5" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-primary/80 font-bold">Promedio Actual</p>
+              <p className="text-xl font-serif font-bold mt-0.5 text-primary">
+                {statsGrades.count > 0 ? statsGrades.promedio.toFixed(2) : "—"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -39,6 +80,7 @@ export function InformacionTab({ materia }: { materia: Materia }) {
             </p>
           </CardContent>
         </Card>
+
 
         {/* Resultados de Aprendizaje */}
         <Card className="border-border/40 bg-primary/5">

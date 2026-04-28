@@ -6,7 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Trophy, Clock, AlertTriangle, CheckCircle, RefreshCw } from "lucide-react";
+import { BookOpen, Trophy, Clock, AlertTriangle, CheckCircle, RefreshCw, Video, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
 import { AvanceGaugeChart } from "@/components/ActivityChart";
 import { PromedioChart } from "@/components/PomodoroTimer";
 
@@ -148,37 +151,43 @@ function DashboardPage() {
         <PromedioChart />
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-serif text-xl">Próximas entregas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {proximasEntregas.length === 0 ? (
-            <div className="text-sm text-muted-foreground py-8 text-center">
-              No hay entregas próximas. Crea trabajos con fecha de entrega para verlos aquí.
-            </div>
-          ) : (
-            <ul className="divide-y divide-border">
-              {proximasEntregas.map((t) => {
-                const fecha = new Date(t.fecha_entrega!);
-                const diff = Math.ceil((fecha.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                const urgente = diff <= 3;
-                return (
-                  <li key={t.id} className="py-3 flex items-center justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{t.titulo}</div>
-                      <div className="text-xs text-muted-foreground">{materiaName(t.materia_id)}</div>
-                    </div>
-                    <div className={`text-sm font-mono ${urgente ? "text-destructive" : "text-muted-foreground"}`}>
-                      {fecha.toLocaleDateString()} · {diff === 0 ? "hoy" : `${diff}d`}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="font-serif text-xl">Próximas entregas</CardTitle>
+            <Trophy className="size-4 text-muted-foreground opacity-50" />
+          </CardHeader>
+          <CardContent>
+            {proximasEntregas.length === 0 ? (
+              <div className="text-sm text-muted-foreground py-8 text-center">
+                No hay entregas próximas.
+              </div>
+            ) : (
+              <ul className="divide-y divide-border">
+                {proximasEntregas.map((t) => {
+                  const fecha = new Date(t.fecha_entrega!);
+                  const diff = Math.ceil((fecha.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  const urgente = diff <= 3;
+                  return (
+                    <li key={t.id} className="py-3 flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate text-sm">{t.titulo}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-tight">{materiaName(t.materia_id)}</div>
+                      </div>
+                      <div className={`text-xs font-mono shrink-0 ${urgente ? "text-destructive" : "text-muted-foreground"}`}>
+                        {fecha.toLocaleDateString()} · {diff === 0 ? "hoy" : `${diff}d`}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <DashboardEncuentros materias={materias ?? []} />
+      </div>
+
 
       <Outlet />
     </AppShell>
@@ -238,3 +247,62 @@ function KPI({
     </Card>
   );
 }
+
+function DashboardEncuentros({ materias }: { materias: any[] }) {
+  const [encuentros, setEncuentros] = useState<any[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("academia-flow-encuentros");
+    if (saved) {
+      try {
+        const all = JSON.parse(saved);
+        const hoy = new Date();
+        const proximos = all
+          .filter((e: any) => e.fecha && new Date(e.fecha) >= hoy)
+          .sort((a: any, b: any) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime())
+          .slice(0, 5);
+        setEncuentros(proximos);
+      } catch (e) {}
+    }
+  }, []);
+
+  const getMateriaInfo = (id: string) => materias.find(m => m.id === id);
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="font-serif text-xl">Próximos Encuentros</CardTitle>
+        <Video className="size-4 text-primary opacity-70" />
+      </CardHeader>
+      <CardContent>
+        {encuentros.length === 0 ? (
+          <div className="text-sm text-muted-foreground py-8 text-center">
+            No hay encuentros programados.
+          </div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {encuentros.map((e) => {
+              const materia = getMateriaInfo(e.materiaId);
+              return (
+                <li key={e.id} className="py-3 flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="font-medium truncate text-sm uppercase tracking-tight">{e.tematica}</div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <div className="size-1.5 rounded-full" style={{ backgroundColor: materia?.color || '#f59e0b' }} />
+                      <span className="text-[10px] text-muted-foreground uppercase">{materia?.nombre || "Materia"}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-xs font-mono text-primary">{new Date(e.fecha).toLocaleDateString()}</div>
+                    <div className="text-[10px] text-muted-foreground">{e.hora}</div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
