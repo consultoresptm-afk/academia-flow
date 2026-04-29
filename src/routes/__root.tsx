@@ -91,25 +91,26 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const isAuthPage = location.pathname === "/auth";
+    const isAuthPage = location.pathname === "/auth" || location.pathname === "/login";
     
-    // 1. No hay usuario -> ir a Login (/auth)
+    // 1. No hay usuario -> ir a Login (/login)
     if (!user && !isAuthPage) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/login" });
       return;
     }
 
-    // 2. Hay usuario pero sin rol -> ir a Login (/auth)
+    // 2. Hay usuario pero sin rol -> ir a Login (/login)
     // Esto previene que usuarios sin registro en user_roles vean el contenido
     if (user && !role && !isAuthPage) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/login" });
       return;
     }
   }, [user, role, loading, location.pathname, navigate]);
 
-  // Solo mostrar el spinner de pantalla completa en la carga inicial crítica
-  // Si ya tenemos usuario, permitimos renderizar el layout para evitar parpadeos
-  if (loading && !user) {
+  const isAuthPage = location.pathname === "/auth" || location.pathname === "/login";
+
+  // Protección de Datos: Bloquear renderizado hasta que la validación se complete
+  if (loading && !isAuthPage) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#1a0505]">
         <div className="size-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />

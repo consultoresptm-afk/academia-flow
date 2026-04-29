@@ -23,11 +23,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
 
   const checkWhitelist = async (u: User) => {
+    // 1. Excepción Mandatoria: Super Admins
     if (SUPER_ADMINS.includes(u.email ?? "")) {
       return true;
     }
 
-    // Consultar rol para validación de whitelist
+    // 2. Consulta Mandatoria: Si no es super admin, DEBE estar en user_roles
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
@@ -35,11 +36,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (error || !data) {
-      console.warn("Acceso denegado: Usuario no encontrado en lista blanca.");
-      toast.error("Acceso Denegado: Su cuenta no ha sido autorizada por el administrador. Contacte a Willi para solicitar acceso.", {
+      console.warn("Acceso denegado: Usuario no autorizado.");
+      
+      // Expulsión Inmediata
+      await supabase.auth.signOut();
+      
+      toast.error("Usuario no autorizado, solicita autorización a William", {
         duration: 10000,
       });
-      await supabase.auth.signOut();
+      
       return false;
     }
 
