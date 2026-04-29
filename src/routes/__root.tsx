@@ -84,7 +84,7 @@ function RealtimeSync() {
 }
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading } = useAuth();
+  const { user, role, loading } = useAuth();
   const navigate = useNavigate();
   const { location } = useRouterState();
   
@@ -92,25 +92,20 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     if (loading) return;
 
     const isAuthPage = location.pathname === "/auth";
-    const isPendingPage = location.pathname === "/pending-approval";
     
-    // 1. No hay usuario -> ir a Login
+    // 1. No hay usuario -> ir a Login (/auth)
     if (!user && !isAuthPage) {
       navigate({ to: "/auth" });
       return;
     }
 
-    // 2. Hay usuario pero no aprobado -> ir a espera
-    if (user && !profile?.is_approved && !isPendingPage && !isAuthPage) {
-      navigate({ to: "/pending-approval" });
+    // 2. Hay usuario pero sin rol -> ir a Login (/auth)
+    // Esto previene que usuarios sin registro en user_roles vean el contenido
+    if (user && !role && !isAuthPage) {
+      navigate({ to: "/auth" });
       return;
     }
-
-    // 3. Usuario aprobado en página de espera -> ir a Dashboard
-    if (user && profile?.is_approved && isPendingPage) {
-      navigate({ to: "/dashboard" });
-    }
-  }, [user, profile, loading, location.pathname, navigate]);
+  }, [user, role, loading, location.pathname, navigate]);
 
   // Solo mostrar el spinner de pantalla completa en la carga inicial crítica
   // Si ya tenemos usuario, permitimos renderizar el layout para evitar parpadeos

@@ -2,6 +2,9 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+const SUPER_ADMINS = ["wmartinezm360@gmail.com", "lauradanielagaleanomoton@gmail.com"];
 
 type AuthContextValue = {
   user: User | null;
@@ -19,6 +22,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  const checkWhitelist = async (u: User) => {
+    if (SUPER_ADMINS.includes(u.email ?? "")) {
+      return true;
+    }
+
+    // Consultar rol para validación de whitelist
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", u.id)
+      .maybeSingle();
+
+    if (error || !data) {
+      console.warn("Acceso denegado: Usuario no encontrado en lista blanca.");
+      toast.error("Acceso Denegado: Su cuenta no ha sido autorizada por el administrador. Contacte a Willi para solicitar acceso.", {
+        duration: 10000,
+      });
+      await supabase.auth.signOut();
+      return false;
+    }
+
+    return true;
+  };
+
   // Perfil con React Query para caching y velocidad
   const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -30,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("user_roles").select("role").eq("user_id", user.id).single()
       ]);
 
-      const isOwner = user.email === "wmartinezm360@gmail.com" || user.email === "lauradanielagaleanomoton@gmail.com";
+      const isOwner = SUPER_ADMINS.includes(user.email ?? "");
       
       const profileData: any = pRes.data || {};
       if (isOwner) {
@@ -39,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return {
         profile: profileData,
-        role: isOwner ? "admin" : (rRes.data?.role ?? "estudiante")
+        role: isOwner ? "admin" : (rRes.data?.role ?? null)
       };
     },
     enabled: !!user,
@@ -48,14 +75,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Escuchar cambios de auth una sola vez
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      if (newSession?.user) {
+        const authorized = await checkWhitelist(newSession.user);
+        if (!authorized) {
+          setSession(null);
+          setUser(null);
+          setAuthLoading(false);
+          return;
+        }
+      }
       setSession(newSession);
       setUser(newSession?.user ?? null);
       setAuthLoading(false);
     });
 
     // Sesión inicial
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
+      if (s?.user) {
+        const authorized = await checkWhitelist(s.user);
+        if (!authorized) {
+          setSession(null);
+          setUser(null);
+          setAuthLoading(false);
+          return;
+        }
+      }
       setSession(s);
       setUser(s?.user ?? null);
       setAuthLoading(false);
@@ -87,7 +132,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    // SSR fallback — provider mounts on client
     return { 
       user: null, 
       session: null, 
@@ -99,3 +143,4 @@ export function useAuth() {
   }
   return ctx;
 }
+
