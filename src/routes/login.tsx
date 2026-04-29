@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Iniciar sesión — AcadémicoPro" },

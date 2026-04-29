@@ -13,7 +13,7 @@ function PendingApproval() {
   if (loading) return null;
 
   if (!user) {
-    return <Navigate to="/auth" />;
+    return <Navigate to="/login" />;
   }
 
   if (profile?.is_approved) {
