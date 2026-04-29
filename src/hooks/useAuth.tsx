@@ -23,32 +23,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
 
   const checkWhitelist = async (u: User) => {
+    const mainAdmin = "wmartinezm360@gmail.com";
+    
     // 1. Excepción Mandatoria: Super Admins
     if (SUPER_ADMINS.includes(u.email ?? "")) {
       return true;
     }
 
-    // 2. Consulta Mandatoria: Si no es super admin, DEBE estar en user_roles
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", u.id)
-      .maybeSingle();
-
-    if (error || !data) {
-      console.warn("Acceso denegado: Usuario no autorizado.");
-      
-      // Expulsión Inmediata
-      await supabase.auth.signOut();
-      
-      toast.error("Usuario no autorizado, solicita autorización a William", {
-        duration: 10000,
+    try {
+      // 2. Intentar llamar a funciones de la DB has_role y is_member
+      // Intentamos has_role primero (asumiendo que devuelve boolean)
+      const { data: hasRole, error: roleError } = await supabase.rpc('has_role', { 
+        _user_id: u.id, 
+        _role: 'admin' 
       });
-      
-      return false;
+
+      if (!roleError && hasRole) return true;
+
+      // Intentamos is_member (asumiendo que devuelve boolean)
+      const { data: isMember, error: memberError } = await supabase.rpc('is_member', {
+        _user_id: u.id
+      });
+
+      if (!memberError && isMember) return true;
+
+      // Si las funciones fallan o no existen, fallback a consulta de tabla user_roles
+      const { data, error: tableError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", u.id)
+        .maybeSingle();
+
+      if (!tableError && data) return true;
+
+    } catch (err) {
+      console.error("Error detectado en funciones de seguridad:", err);
+      // Fallback Mandatorio: Si el sistema falla, permitir acceso al admin principal
+      if (u.email === mainAdmin) return true;
     }
 
-    return true;
+    // Fallback Final para evitar bloqueos del admin principal
+    if (u.email === mainAdmin) return true;
+
+    console.warn("Acceso denegado: Usuario no autorizado.");
+    
+    // Expulsión Inmediata
+    await supabase.auth.signOut();
+    
+    toast.error("Usuario no autorizado, solicita autorización a William", {
+      duration: 10000,
+    });
+    
+    return false;
   };
 
   // Perfil con React Query para caching y velocidad
